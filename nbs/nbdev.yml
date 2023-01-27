@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "spot-mark-gene"
+  site-url: "https://dsm-72.github.io/spot-mark-gene"
+  description: "spot marker genes in data"
+  repo-branch: main
+  repo-url: "https://github.com/dsm-72/spot-mark-gene"
