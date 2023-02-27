@@ -8,3 +8,4 @@ jobs:
       - uses: fastai/workflows/nbdev-ci@master
         with:
           python-version: '3.10'
+          version: '3.10'
