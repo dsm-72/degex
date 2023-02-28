@@ -182,7 +182,7 @@ def add_gene_annotations(
     return adata
 
 # %% ../nbs/03_adata.ipynb 8
-from spot_mark_gene.utils import (
+from degex.utils import (
     time_to_num_from_idx_to_time
 )
 def combine_timepoints(

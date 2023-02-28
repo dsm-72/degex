@@ -3,7 +3,7 @@
 d = { 'settings': { 'branch': 'main',
                 'doc_baseurl': '/spot-mark-gene',
                 'doc_host': 'https://dsm-72.github.io',
-                'git_url': 'https://github.com/dsm-72/spot-mark-gene',
+                'git_url': 'https://github.com/dsm-72/degex',
                 'lib_path': 'degex'},
   'syms': { 'degex.adata': { 'degex.adata.add_batch_mean_center_layer': ('adata.html#add_batch_mean_center_layer', 'degex/adata.py'),
                              'degex.adata.add_gene_annotations': ('adata.html#add_gene_annotations', 'degex/adata.py'),
