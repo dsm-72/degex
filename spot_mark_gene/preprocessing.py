@@ -76,7 +76,7 @@ def filter_pipeline(
         CutoffSpecification('total_counts', 500, 10000),
         CutoffSpecification('pct_counts_mito', None, 15),
         CutoffSpecification('pct_counts_ribo', None, 15),
-        CutoffSpecification('doublet_score', None, 0.4),
+        CutoffSpecification('doublet_scores', None, 0.4),
     ],
     min_cells:int=5
 ) -> AnnData:    

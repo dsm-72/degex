@@ -2,11 +2,11 @@
 
 # %% auto 0
 __all__ = ['AnnData', 'AnnDatas', 'Graph', 'SeriesLike', 'VAR_GENE_SYMBOL', 'VAR_GENE_IDS', 'VAR_MITO', 'VAR_RIBO',
-           'VAR_HIGHLY_VARIABLE', 'OBS_BATCH', 'OBS_TIMEPOINT', 'OBS_TOTAL_COUNTS', 'OBS_DOUBLET_SCORES',
-           'OBS_PREDICTED_DOUBLETS', 'VAR_HUMAN_TF', 'VAR_MOUSE_TF', 'VAR_HUMAN_GENE_SYMBOL', 'VAR_HUMAN_ENSEMBLE_ID',
-           'VAR_MOUSE_ENSEMBLE_ID', 'LAYER_PRENORM', 'LAYER_DETECTED', 'LAYER_SCALED_NORMALIZED', 'EMB_MAGIC',
-           'EMB_PCA', 'EMB_PCA_HVG', 'EMB_PHATE', 'EMB_PHATE_HVG', 'CUTOFF_KIND', 'CUTOFF_SHORTHAND_TO_OBS_KEYS',
-           'CutoffSpecifications', 'str_to_cutoff_kind', 'CutoffSpecification']
+           'VAR_HIGHLY_VARIABLE', 'VAR_HUMAN_TF', 'VAR_MOUSE_TF', 'VAR_HUMAN_GENE_SYMBOL', 'VAR_HUMAN_ENSEMBLE_ID',
+           'VAR_MOUSE_ENSEMBLE_ID', 'VAR_KEY', 'OBS_BATCH', 'OBS_TIMEPOINT', 'OBS_TOTAL_COUNTS', 'OBS_DOUBLET_SCORES',
+           'OBS_PREDICTED_DOUBLETS', 'OBS_KEY', 'LAYER_PRENORM', 'LAYER_DETECTED', 'LAYER_SCALED_NORMALIZED',
+           'LAYER_KEY', 'EMB_MAGIC', 'EMB_PCA', 'EMB_PCA_HVG', 'EMB_PHATE', 'EMB_PHATE_HVG', 'OBSM_KEY', 'CUTOFF_KIND',
+           'CUTOFF_SHORTHAND_TO_OBS_KEYS', 'CutoffSpecifications', 'str_to_cutoff_kind', 'CutoffSpecification']
 
 # %% ../nbs/01_types.ipynb 3
 # NOTE: needed for python 3.10 forward compatibility with scanpy as 
@@ -45,85 +45,108 @@ SeriesLike: TypeAlias = Union[Series, list, ndarray]
 
 
 # Type Alias for adata.var field
-VAR_GENE_SYMBOL: TypeAlias = Literal['gene_symbol']
+VAR_GENE_SYMBOL = 'gene_symbol'
 
 # Type Alias for adata.var field
-VAR_GENE_IDS: TypeAlias = Literal['gene_ids']
+VAR_GENE_IDS = 'gene_ids'
 
 # Type Alias for adata.var field
-VAR_MITO: TypeAlias = Literal['mito']
+VAR_MITO = 'mito'
 
 # Type Alias for adata.var field
-VAR_RIBO: TypeAlias = Literal['ribo']
+VAR_RIBO = 'ribo'
 
 # Type Alias for adata.var field
-VAR_HIGHLY_VARIABLE: TypeAlias = Literal['ribo']
-
-# Type Alias for adata.obs field
-OBS_BATCH: TypeAlias = Literal['batch']
-
-# Type Alias for adata.obs field
-OBS_TIMEPOINT: TypeAlias = Literal['timepoint']
-
-# Type Alias for adata.obs field
-OBS_TOTAL_COUNTS: TypeAlias = Literal['total_counts']
-
-# Type Alias for adata.obs field
-OBS_DOUBLET_SCORES: TypeAlias = Literal['doublet_scores']
-
-# Type Alias for adata.obs field
-OBS_PREDICTED_DOUBLETS: TypeAlias = Literal['predicted_doublets']
+VAR_HIGHLY_VARIABLE = 'ribo'
 
 # Human Transcription Factor key in adata.var
-VAR_HUMAN_TF: TypeAlias = Literal['HumanTFs']
+VAR_HUMAN_TF = 'HumanTFs'
 
 # Mouse Transcription Factor key in adata.var
-VAR_MOUSE_TF: TypeAlias = Literal['MouseTFs']
+VAR_MOUSE_TF = 'MouseTFs'
 
 # Human Gene Symbol key in adata.var
-VAR_HUMAN_GENE_SYMBOL: TypeAlias = Literal['HumanGeneSymbol']
+VAR_HUMAN_GENE_SYMBOL = 'HumanGeneSymbol'
 
 # Human Ensemble ID key in adata.var
-VAR_HUMAN_ENSEMBLE_ID: TypeAlias = Literal['HumanEnsemblID']
+VAR_HUMAN_ENSEMBLE_ID = 'HumanEnsemblID'
 
 # Mouse Ensemble ID key in adata.var
-VAR_MOUSE_ENSEMBLE_ID: TypeAlias = Literal['MouseEnsemblID']
+VAR_MOUSE_ENSEMBLE_ID = 'MouseEnsemblID'
+
+VAR_KEY: TypeAlias = Literal[
+    VAR_GENE_SYMBOL, VAR_GENE_IDS,
+    VAR_MITO, VAR_RIBO, VAR_HIGHLY_VARIABLE,
+    VAR_HUMAN_TF, VAR_MOUSE_TF, VAR_HUMAN_GENE_SYMBOL,
+    VAR_HUMAN_ENSEMBLE_ID, VAR_MOUSE_ENSEMBLE_ID
+]
+
+
+# Type Alias for adata.obs field
+OBS_BATCH = 'batch'
+
+# Type Alias for adata.obs field
+OBS_TIMEPOINT = 'timepoint'
+
+# Type Alias for adata.obs field
+OBS_TOTAL_COUNTS = 'total_counts'
+
+# Type Alias for adata.obs field
+OBS_DOUBLET_SCORES = 'doublet_scores'
+
+# Type Alias for adata.obs field
+OBS_PREDICTED_DOUBLETS = 'predicted_doublets'
+
+OBS_KEY: TypeAlias = Literal[
+    OBS_BATCH, OBS_TIMEPOINT, OBS_TOTAL_COUNTS,
+    OBS_DOUBLET_SCORES, OBS_PREDICTED_DOUBLETS
+]
 
 # Layer storing prenormalized counts in adata.layers
-LAYER_PRENORM: TypeAlias = Literal['X_prenorm']
+LAYER_PRENORM = 'X_prenorm'
 
 # Layer storing values where prenormalized counts is at least 0 in adata.layers
-LAYER_DETECTED: TypeAlias = Literal['X_detected']
+LAYER_DETECTED = 'X_detected'
 
 # Layer storing counts normalized
-LAYER_SCALED_NORMALIZED: TypeAlias = Literal['X_scaled_normalised']
+LAYER_SCALED_NORMALIZED = 'X_scaled_normalised'
+
+LAYER_KEY: TypeAlias = Literal[
+    LAYER_PRENORM, LAYER_DETECTED,
+    LAYER_SCALED_NORMALIZED
+]
 
 # Layer storing MAGIC embedding in adata.obsm
-EMB_MAGIC:TypeAlias = Literal['X_magic']
+EMB_MAGIC = 'X_magic'
 
 # Layer storing PCA embedding in adata.obsm
-EMB_PCA: TypeAlias = Literal['X_pca']
+EMB_PCA = 'X_pca'
 
 # Layer storing PCA embedding just on HVGs in adata.obsm
-EMB_PCA_HVG: TypeAlias = Literal['X_pca_hvg']
+EMB_PCA_HVG = 'X_pca_hvg'
 
 # Layer storing PHATE embedding just in adata.obsm
-EMB_PHATE: TypeAlias = Literal['X_phate']
+EMB_PHATE = 'X_phate'
 
 # Layer storing PHATE embedding just on HVGs in adata.obsm
-EMB_PHATE_HVG: TypeAlias = Literal['X_phate_hvg']
+EMB_PHATE_HVG = 'X_phate_hvg'
+
+OBSM_KEY: TypeAlias = Literal[
+    EMB_MAGIC, EMB_PCA, EMB_PCA_HVG,
+    EMB_PHATE, EMB_PHATE_HVG
+]
 
 # Types of cutoffs that can be used in our cutoff function
 CUTOFF_KIND = Literal[
-    'total_counts', 'pct_counts_mito', 
-    'pct_counts_ribo', 'doublet_score'
+    OBS_TOTAL_COUNTS, 'pct_counts_mito', 
+    'pct_counts_ribo', OBS_DOUBLET_SCORES
 ]
 
 CUTOFF_SHORTHAND_TO_OBS_KEYS = {
-    'default': 'total_counts', # 500 < obs < 10000
+    'default': OBS_TOTAL_COUNTS, # 500 < obs < 10000
     'mito': 'pct_counts_mito', # None < obs < 15
     'ribo': 'pct_counts_ribo', # None < obs < 15
-    'doublet': 'doublet_score', # None < obs < 0.4
+    'doublet': OBS_DOUBLET_SCORES, # None < obs < 0.4
 }
 
 

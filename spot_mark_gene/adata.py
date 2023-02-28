@@ -269,7 +269,7 @@ def calc_qc_stats(adata:AnnData) -> AnnData:
             var_names.str.startswith("mt-")
     
     adata.var[VAR_RIBO] = adata.\
-            var_names.str.startswith(("rps","rpl"))
+            var_names.str.startswith(("rps", "rpl"))
 
     sc.pp.calculate_qc_metrics(
         adata, 
