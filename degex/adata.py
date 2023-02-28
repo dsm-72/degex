@@ -20,7 +20,7 @@ collections.MutableSet = collections.abc.MutableSet
 collections.MutableMapping = collections.abc.MutableMapping
 
 # %% ../nbs/03_adata.ipynb 4
-from spot_mark_gene.types import (
+from degex.types import (
     AnnData, AnnDatas, Graph, SeriesLike,
     VAR_HUMAN_TF, VAR_MOUSE_TF,
     VAR_HUMAN_ENSEMBLE_ID, VAR_MOUSE_ENSEMBLE_ID,

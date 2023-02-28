@@ -14,7 +14,7 @@ collections.MutableSet = collections.abc.MutableSet
 collections.MutableMapping = collections.abc.MutableMapping
 
 # %% ../nbs/05_preprocessing.ipynb 4
-from spot_mark_gene.types import (
+from degex.types import (
     AnnData, AnnDatas, Graph, SeriesLike,
     VAR_HUMAN_TF, VAR_MOUSE_TF,
     VAR_HUMAN_ENSEMBLE_ID, VAR_MOUSE_ENSEMBLE_ID,
@@ -46,7 +46,7 @@ import phate
 import magic
 
 # %% ../nbs/05_preprocessing.ipynb 6
-from spot_mark_gene.adata import (
+from degex.adata import (
     add_gene_ids_to_adata,
     add_gene_symbols_to_adata,
     score_doublets, apply_filter_by_cutoffs,

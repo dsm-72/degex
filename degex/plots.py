@@ -13,6 +13,22 @@ collections.Mapping = collections.abc.Mapping
 collections.MutableSet = collections.abc.MutableSet
 collections.MutableMapping = collections.abc.MutableMapping
 
+# %% ../nbs/04_plots.ipynb 4
+from degex.types import (
+    AnnData, AnnDatas, Graph, SeriesLike,
+    VAR_HUMAN_TF, VAR_MOUSE_TF,
+    VAR_HUMAN_ENSEMBLE_ID, VAR_MOUSE_ENSEMBLE_ID,
+    LAYER_PRENORM, LAYER_DETECTED,
+    LAYER_SCALED_NORMALIZED, EMB_MAGIC,
+    EMB_PCA, EMB_PCA_HVG,
+    EMB_PHATE, EMB_PHATE_HVG,
+    CUTOFF_KIND, CUTOFF_SHORTHAND_TO_OBS_KEYS,
+    CutoffSpecification, CutoffSpecifications,
+    VAR_GENE_SYMBOL, VAR_GENE_IDS,
+    OBS_DOUBLET_SCORES, OBS_PREDICTED_DOUBLETS,
+    VAR_MITO
+)
+
 # %% ../nbs/04_plots.ipynb 5
 import os
 import copy
@@ -38,7 +54,7 @@ def plot_library_size(adata:AnnData, lower:float, upper:float):
     )
 
 # %% ../nbs/04_plots.ipynb 7
-from spot_mark_gene.utils import (
+from degex.utils import (
     make_qc_fig_filename
 )
 

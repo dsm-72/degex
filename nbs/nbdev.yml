@@ -2,7 +2,7 @@ project:
   output-dir: _docs
 
 website:
-  title: "spot-mark-gene"
+  title: "degex"
   site-url: "https://dsm-72.github.io/spot-mark-gene"
   description: "spot marker genes in data"
   repo-branch: main
