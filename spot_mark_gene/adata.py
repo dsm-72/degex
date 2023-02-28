@@ -32,7 +32,9 @@ from spot_mark_gene.types import (
     CutoffSpecification, CutoffSpecifications,
     VAR_GENE_SYMBOL, VAR_GENE_IDS,
     OBS_DOUBLET_SCORES, OBS_PREDICTED_DOUBLETS,
-    VAR_MITO
+    VAR_MITO, VAR_RIBO, OBS_TOTAL_COUNTS,
+    VAR_HUMAN_GENE_SYMBOL, OBS_BATCH,
+    OBS_TIMEPOINT, VAR_HIGHLY_VARIABLE
 )
 
 # %% ../nbs/03_adata.ipynb 5
@@ -53,20 +55,81 @@ import magic
 
 # %% ../nbs/03_adata.ipynb 6
 def add_gene_symbols_to_adata(adata:AnnData) -> AnnData:
+    """
+    Enfoces that `adata.var` names are unique and adds 
+    `gene_symbol` to `adata.var`.
+    
+    Parameters
+    ----------
+    adata
+        AnnData to process
+        
+    Returns
+    -------
+    adata
+        for function chaining
+    """
     adata.var_names_make_unique()
     adata.var[VAR_GENE_SYMBOL] = adata.var_names
     return adata
 
 def add_gene_ids_to_adata(adata:AnnData) -> AnnData:
+    """
+    Adds `gene_ids` to `adata.var`.
+    
+    Parameters
+    ----------
+    adata
+        AnnData to process
+        
+    Returns
+    -------
+    adata
+        for function chaining
+    """
     adata.var_names = adata.var[VAR_GENE_IDS]
     return adata
 
 def remove_mitochondrial_genes(adata:AnnData) -> AnnData:
+    """
+    Filters `adata` by colums not in `adata.var.mito`.
+    
+    Parameters
+    ----------
+    adata
+        AnnData to process
+        
+    Returns
+    -------
+    adata
+        for function chaining
+    """
     adata = adata[:, ~adata.var[VAR_MITO]]
     return adata
 
-def score_doublets(adata:AnnData, plot:bool=False) -> AnnData:   
-    scrub = scr.Scrublet(adata.X)
+def score_doublets(adata:AnnData, plot:bool=False, **kwargs) -> AnnData:   
+    f"""
+    Adds `{OBS_DOUBLET_SCORES}` and `{OBS_PREDICTED_DOUBLETS}` to `adata.obs`.
+    
+    Parameters
+    ----------
+    adata
+        AnnData to process. Note that `adata.X` gets passed 
+        as `counts_matrix` to `scrublet.Scrublet(...)`.
+
+    plot
+        Whether or not to plot scrublet histogram.
+
+    kwargs
+        Other key-value arguments to passed to `scrublet.Scrublet()`.
+    
+    Returns
+    -------
+    adata
+        for function chaining
+    """
+    assert 'counts_matrix' not in kwargs
+    scrub = scr.Scrublet(counts_matrix=adata.X, **kwargs)
     adata.obs[OBS_DOUBLET_SCORES], adata.obs[OBS_PREDICTED_DOUBLETS] =\
         scrub.scrub_doublets()
     if plot:
@@ -79,6 +142,28 @@ def add_gene_annotations(
     adata:AnnData,
     annotation_file:str
 ) -> AnnData:
+    """
+    Reads CSV and adds Ensembl information to 
+    `adata.var.index`
+    
+    Parameters
+    ----------
+    adata
+        AnnData to process
+
+    annotation_file
+        full path to csv file. Assumed to have a column
+        called `Ensembl`.
+        
+    Returns
+    -------
+    adata
+        for function chaining
+
+    Notes
+    -----
+    Assumes that `annotation_file` has a column `'Ensembl'` in it.
+    """
     # Load gene annotation information (extracted from bioconductor)    
     gene_annotation = pd.read_csv(
         annotation_file, index_col=None, header=0
@@ -104,22 +189,43 @@ def combine_timepoints(
     *adatas:AnnDatas, 
     idx_to_time:dict,
     print_counts:bool=False
-):
-    '''
-    Examples:
+) -> AnnData:    
+    """
+    Concatenates the each one of the `adata`s in  
+    `adatas` to a single `adata` instance.
+    
+    Parameters
+    ----------
+    *adatas
+        AnnData to process. Note that `adata.X` gets passed 
+        as `counts_matrix` to `scrublet.Scrublet(...)`.
 
-        idx_to_time = {
+    idx_to_time
+        map of {int|str: str} for indicies to human friendly 
+        time values.
+
+    print_counts
+        Whether or not to print batched value counts.
+    
+    Returns
+    -------
+    adata
+        Concatenated adata.
+    
+    Examples
+    --------
+    >>>    idx_to_time = {
             '0': '12hr', 
             '1': '18hr', 
             '2': '24hr'
         }
 
-        time_to_num = {
+    >>>   time_to_num = {
             '12hr': '12', 
             '18hr': '18', 
             '24hr': '24'
         }
-    '''
+    """
     time_to_num = time_to_num_from_idx_to_time(idx_to_time)
 
     adata = ad.concat(
@@ -127,33 +233,52 @@ def combine_timepoints(
         index_unique="_", merge="same", join='outer'
     )
 
-    adata.obs['batch'] = adata.obs.index.astype(str).str[-1]
+    adata.obs[OBS_BATCH] = adata.obs.index.astype(str).str[-1]
 
-    adata.obs['batch'] = adata.obs['batch']\
+    adata.obs[OBS_BATCH] = adata.obs[OBS_BATCH]\
         .replace(idx_to_time)
     
-    adata.obs['timepoint'] = adata.obs['batch']\
+    adata.obs[OBS_TIMEPOINT] = adata.obs[OBS_BATCH]\
         .replace(time_to_num)
 
     if print_counts:
-        print(adata.obs.batch.value_counts())
+        print(adata.obs[OBS_BATCH].value_counts())
     return adata
 
 # %% ../nbs/03_adata.ipynb 9
 def calc_qc_stats(adata:AnnData) -> AnnData:
+    f"""
+    Calculates {VAR_MITO} and {VAR_RIBO} qc metrics
+    
+    Parameters
+    ----------
+    adata
+        AnnData to process
+
+    annotation_file
+        full path to csv file. Assumed to have a column
+        called `Ensembl`.
+        
+    Returns
+    -------
+    adata
+        for function chaining
+    """
     # Calculate QC stats
-    adata.var["mito"] = adata.\
+    adata.var[VAR_MITO] = adata.\
             var_names.str.startswith("mt-")
     
-    adata.var['ribo'] = adata.\
+    adata.var[VAR_RIBO] = adata.\
             var_names.str.startswith(("rps","rpl"))
 
     sc.pp.calculate_qc_metrics(
-        adata, qc_vars=["mito", "ribo"], inplace=True
+        adata, 
+        qc_vars=[VAR_MITO, VAR_RIBO], 
+        inplace=True
     )
 
     adata.obs['log10_total_counts'] = np.log10(
-        adata.obs["total_counts"]
+        adata.obs[OBS_TOTAL_COUNTS]
     )
     return adata
 
@@ -162,9 +287,40 @@ def filter_by_cutoffs(
     adata:AnnData, 
     lower:float=None, 
     upper:float=None,
-    obs_key:CUTOFF_KIND='total_counts',
+    obs_key:CUTOFF_KIND=OBS_TOTAL_COUNTS,
     print_counts:bool=False,      
 ) -> AnnData:
+    """
+    Uses `obs_key` to filter `adata` between `lower` and `upper` if provided e.g. 
+    `lower < adata.obs[obs_key] < upper`
+    
+    Parameters
+    ----------
+    adata
+        AnnData to process.
+
+    lower
+        Defaults to `None`. The value which `adata.obs[obs_key]` 
+        should be greater than. If `None`, `lower` is not used.
+    
+    upper
+        Defaults to `None`. The value which `adata.obs[obs_key]` 
+        should be less than. If `None`, `upper` is not used.
+
+    obs_key
+        Which observation to test against.
+        One of `'total_counts'`, `'pct_counts_mito'`, 
+        `'pct_counts_ribo'`, or `'doublet_score'`. Defaults
+        to `'total_counts'`. 
+
+    print_counts
+        Whether or not to print counts.
+    
+    Returns
+    -------
+    adata
+        for function chaining
+    """
     assert obs_key is not None
     if lower is not None:
         adata[adata.obs[obs_key] > lower]
@@ -178,7 +334,32 @@ def apply_filter_by_cutoffs(
     adata:AnnData, 
     cutoff_specs:CutoffSpecifications,
     print_counts:bool=False   
-):
+) -> AnnData:
+    """
+    Uses `obs_key` to filter `adata` between `lower` and `upper` if provided e.g. 
+    `lower < adata.obs[obs_key] < upper`
+    
+    Parameters
+    ----------
+    adata
+        AnnData to process.
+
+    cutoff_specs
+        Specifications in the form of `(obs_key, lower, upper)`
+        to be used to `filter_by_cutoffs`.
+
+    print_counts
+        Whether or not to print counts.
+    
+    Returns
+    -------
+    adata
+        for function chaining
+
+    See also
+    --------
+    filter_by_cutoffs: singular instance of filtering.
+    """
     for spec in cutoff_specs:
         adata = filter_by_cutoffs(
             adata, spec.lower, spec.upper, 
@@ -189,11 +370,37 @@ def apply_filter_by_cutoffs(
 
 # %% ../nbs/03_adata.ipynb 11
 def add_prenormalization_layer(adata:AnnData) -> AnnData:
+    f"""
+    Stores `adata.X` to `layers[{LAYER_PRENORM}]`
+    
+    Parameters
+    ----------
+    adata
+        AnnData to process.
+    
+    Returns
+    -------
+    adata
+        for function chaining
+    """
     # Store unnormalised counts
     adata.layers[LAYER_PRENORM] = adata.X
     return adata
 
 def add_gene_detection_layer(adata:AnnData) -> AnnData:
+    f"""
+    Stores `adata.X > 0` to `layers[{LAYER_DETECTED}]`
+    
+    Parameters
+    ----------
+    adata
+        AnnData to process.
+    
+    Returns
+    -------
+    adata
+        for function chaining
+    """
     # Store unnormalised counts
     if LAYER_PRENORM not in adata.layers:
         adata = add_prenormalization_layer(adata)
@@ -207,6 +414,20 @@ def add_gene_detection_layer(adata:AnnData) -> AnnData:
     return adata
 
 def sqrt_library_size_normalize(adata:AnnData) -> AnnData:
+    f"""
+    Runs `sqrt(library_size_normalize(adata.X))` and stores
+    it in `adata.X`.
+    
+    Parameters
+    ----------
+    adata
+        AnnData to process.
+    
+    Returns
+    -------
+    adata
+        for function chaining
+    """
     # Normalise by library size and square-root transform
     adata = adata.copy()
     adata.X = scipy.sparse.csr_matrix(
@@ -220,12 +441,26 @@ def sqrt_library_size_normalize(adata:AnnData) -> AnnData:
 
 # %% ../nbs/03_adata.ipynb 12
 def add_batch_mean_center_layer(adata:AnnData) -> AnnData:
+    f"""
+    Runs `batch_mean_center(adata.X)` and stores
+    it in `adata.layers[{LAYER_SCALED_NORMALIZED}]`.
+    
+    Parameters
+    ----------
+    adata
+        AnnData to process.
+    
+    Returns
+    -------
+    adata
+        for function chaining
+    """
     # Batch mean center before cell cycle scoring
     adata.raw = adata
     adata.X = scipy.sparse.csr_matrix(
         sc.normalize.batch_mean_center(
             adata.X.toarray(), 
-            sample_idx = adata.obs['batch']
+            sample_idx = adata.obs[OBS_BATCH]
         )
     )
 
@@ -238,25 +473,68 @@ def score_genes_cell_cycle_with_batch_mean_center_data(
         s_genes:Sequence[str], 
         g2m_genes:Sequence[str],
 ) -> AnnData:
+    f"""
+    Uses `adata.layers[{LAYER_SCALED_NORMALIZED}]` to run
+    `sc.tl.score_genes_cell_cycle` and stores results in 
+    `adata`.
+
     
+    Parameters
+    ----------
+    adata
+        AnnData to process.
+
+    s_genes
+        List of genes associated with S phase.
+
+    g2m_genes
+        List of genes associated with G2M phase.
+    
+    Returns
+    -------
+    adata
+        for function chaining
+    """
     sdata = adata.layers[LAYER_SCALED_NORMALIZED]
     # Get normalised counts back instead of mean centered values as pca will mean center
     sc.tl.score_genes_cell_cycle(sdata, s_genes=s_genes, g2m_genes=g2m_genes)
+
+    adata.obs.S_score = sdata.obs.S_score
+    adata.obs.G2M_score = sdata.obs.G2M_score
+    adata.obs.phase = sdata.obs.phase
+
     return adata
 
 def load_human_genes(
     adata:AnnData, filename:str
 ) -> List[str]:
+    f'''
+    Reads the file uses `adata` to confirm validity
+    
+    Parameters
+    ----------
+    adata
+        AnnData to process.
+
+    filename
+        Plaintext file with one column and a single gene
+        on each row with in its HumanGeneSymbol form.
+    
+    Returns
+    -------
+    adata
+        for function chaining
+
+    Notes
+    -----
+    Assumes `adata.var` has `{VAR_HUMAN_GENE_SYMBOL}`. 
     '''
-    NOTE:
-        - uses adata to confirm validity
-    '''
-    assert hasattr(adata.var, 'HumanGeneSymbol')
+    assert hasattr(adata.var, VAR_HUMAN_GENE_SYMBOL)
 
     with open(filename, 'r') as f:
         genes = f.readlines()
         genes = [gene.strip() for gene in genes]
-        genes = adata.var.index[adata.var.HumanGeneSymbol.isin(genes)]
+        genes = adata.var.index[adata.var[VAR_HUMAN_GENE_SYMBOL].isin(genes)]
         return genes
 
 # %% ../nbs/03_adata.ipynb 13
@@ -264,20 +542,36 @@ def select_hvg_per_batch(
     adata:AnnData,
     hvg_kwargs:dict=dict(cutoff=None, percentile=90)
 ) -> AnnData:
+    '''
+    Calculates highly variable genes per batch in `adata`
+    
+    Parameters
+    ----------
+    adata
+        AnnData to process.
+
+    hvg_kwargs
+        Options to be passed to `sc.select_highly_variable_genes`.
+    
+    Returns
+    -------
+    adata
+        for function chaining
+    '''
     # Select highly variable genes from any batch
     hvg_all = []
-    for batch in adata.obs.batch.unique():
+    for batch in adata.obs[OBS_BATCH].unique():
         normalised, hgv_vars = sc.select.highly_variable_genes(
-            adata[adata.obs.batch == batch].X.toarray(), 
-            adata[adata.obs.batch == batch].var.index, 
+            adata[adata.obs[OBS_BATCH] == batch].X.toarray(), 
+            adata[adata.obs[OBS_BATCH] == batch].var.index, 
             **hvg_kwargs
         )
         hvg_all.extend(hgv_vars)
-        adata.var[f'highly_variable_{batch}'] = adata.var.index.isin(hgv_vars)
+        adata.var[f'{VAR_HIGHLY_VARIABLE}_{batch}'] = adata.var.index.isin(hgv_vars)
         del normalised
         print(f"Unique HVGs after {batch} {len(np.unique(np.array(hvg_all)))}")
         
-    adata.var['highly_variable'] = adata.var.index.isin(hvg_all)
+    adata.var[VAR_HIGHLY_VARIABLE] = adata.var.index.isin(hvg_all)
     return adata
 
 # %% ../nbs/03_adata.ipynb 14

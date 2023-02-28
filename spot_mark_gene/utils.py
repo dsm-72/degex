@@ -47,9 +47,29 @@ import magic
 
 # %% ../nbs/02_utils.ipynb 6
 def remove_non_numeric_from_str(s:str) -> str:
+    '''
+    Removes non-numbers from string.
+    Utility function used in `time_to_num_from_idx_to_time`.
+    '''
     return str(filter(str.isdigit, s))
 
 def time_to_num_from_idx_to_time(idx_to_time:dict) -> dict:
+    '''
+    Examples:
+        idx_to_time = {
+            '0': '12hr', 
+            '1': '18hr', 
+            '2': '24hr'
+        }
+
+        gets converted into
+
+        time_to_num = {
+            '12hr': '12', 
+            '18hr': '18', 
+            '24hr': '24'
+        }
+    '''
     time_to_num = {
         v: remove_non_numeric_from_str(v)
         for v in idx_to_time.values()
@@ -61,6 +81,11 @@ def make_qc_fig_filename(
     study_name:str,
     x:str, y:str, postfix:str=''
 ) -> str:     
+    '''
+    Utility function used in make_qc_figs to name files.
+    Output files are in the form of:
+    `{save_dir}/.QC_{study_name}_{x}_{y}_{postfix}.png`
+    '''
     if postfix:
         postfix = f'_{postfix}'
     return os.path.join(
