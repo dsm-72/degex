@@ -1,0 +1,10 @@
+website:
+  sidebar:
+    contents:
+      - index.ipynb
+      - 00_core.ipynb
+      - 01_types.ipynb
+      - 02_utils.ipynb
+      - 03_adata.ipynb
+      - 04_plots.ipynb
+      - 05_preprocessing.ipynb
