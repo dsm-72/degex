@@ -51,7 +51,8 @@ def remove_non_numeric_from_str(s:str) -> str:
     Removes non-numbers from string.
     Utility function used in `time_to_num_from_idx_to_time`.
     '''
-    return str(filter(str.isdigit, s))
+    s = ''.join(filter(str.isdigit, s))
+    return s
 
 def time_to_num_from_idx_to_time(idx_to_time:dict) -> dict:
     '''

@@ -1,0 +1,110 @@
+tissue,subtissue,gene,gene_stable_id
+Endoderm,Endoderm,PRDX5,ENSDARG00000055064
+Endoderm,Endoderm,FOXA1,ENSDARG00000102138
+Endoderm,Endoderm,FOXA2,ENSDARG00000003411
+Endoderm,Pharyngeal endoderm,NKX2.7,ENSDARG00000021232
+Endoderm,Pharyngeal endoderm,IRX7,ENSDARG00000002601
+Endoderm,Posterior (pancreatic and interstinal endoderm),CDX4,ENSDARG00000036292
+Axial Mesoderm,Prechordal plate,HE1A,ENSDARG00000023656
+Axial Mesoderm,Prechordal plate,HE1B,ENSDARG00000019122
+Axial Mesoderm,Prechordal plate,CTSLB,ENSDARG00000095072
+Axial Mesoderm,Notochord,COL2A1A,ENSDARG00000069093
+Axial Mesoderm,Notochord,COL8A1A,ENSDARG00000077403
+Axial Mesoderm,Notochord,P4HA1B,ENSDARG00000071082
+Axial Mesoderm,Notochord,TA,ENSDARG00000101576
+Axial Mesoderm,Notochord,NOTO,ENSDARG00000021201
+Axial Mesoderm,Notochord,NTD5,ENSDARG00000040944
+Intermediate / Lateral Mesoderm,Celphalic mesoderm,FOXF2A,ENSDARG00000017195
+Intermediate / Lateral Mesoderm,Celphalic mesoderm,FSTA,ENSDARG00000052846
+Intermediate / Lateral Mesoderm,Hematopoietic,TAL1,ENSDARG00000019930
+Intermediate / Lateral Mesoderm,Hematopoietic,LMO2,ENSDARG00000095019
+Intermediate / Lateral Mesoderm,ICM/erythroid,GATA1A,ENSDARG00000013477
+Intermediate / Lateral Mesoderm,Rostral blood island (myeloid),SPI1B,ENSDARG00000000767
+Intermediate / Lateral Mesoderm,Pronephric progenitors,FOXJ1A,ENSDARG00000101919
+Intermediate / Lateral Mesoderm,Pronephric progenitors,PAX2A,ENSDARG00000028148
+Intermediate / Lateral Mesoderm,Heart primordium,HAND2,ENSDARG00000008305
+Paraxial mesoderm,Adaxial,MYL10,ENSDARG00000062592
+Paraxial mesoderm,Adaxial,MYOD1,ENSDARG00000030110
+Paraxial mesoderm,Adaxial,MYOG,ENSDARG00000009438
+Paraxial mesoderm,Somites,MEOX1,ENSDARG00000007891
+Paraxial mesoderm,Somites,RIPPLY1,ENSDARG00000054103
+Paraxial mesoderm,Somites,ALDH1A2,ENSDARG00000053493
+Paraxial mesoderm,Forming somites,MESPBA,ENSDARG00000030347
+Paraxial mesoderm,Forming somites,RIPPLY2,ENSDARG00000070535
+Paraxial mesoderm,Forming somites,TBX6,ENSDARG00000011785
+Paraxial mesoderm,Presomitic mesoderm,TBX6L,ENSDARG00000006939
+Paraxial mesoderm,Tailbud,SOX2,ENSDARG00000070913
+Paraxial mesoderm,Tailbud,TA,ENSDARG00000101576
+Paraxial mesoderm,Tailbud,NOTO,ENSDARG00000021201
+Paraxial mesoderm,Tailbud,FGF8A,ENSDARG00000003399
+Paraxial mesoderm,Tailbud,WNT8A,ENSDARG00000078507
+Neural,Neural crest,FOXD3,ENSDARG00000021032
+Neural,Neural crest,SOX9B,ENSDARG00000043923
+Neural,Neural crest,SOX10,ENSDARG00000077467
+Neural,Floor plate,SHHA,ENSDARG00000068567
+Neural,Floor plate,SHHB,ENSDARG00000038867
+Neural,Floor plate,FOXJ1A,ENSDARG00000101919
+Neural,Floor plate,FOXA2,ENSDARG00000003411
+Neural,Spinal cord,ELAVL3,ENSDARG00000014420
+Neural,Spinal cord,NEUROD1,ENSDARG00000019566
+Neural,Spinal cord,NEUROD4,ENSDARG00000003469
+Neural,Spinal cord,NEUROG1,ENSDARG00000056130
+Fore/mid-brain,Midbrain,ENG2A,ENSDARG00000026599
+Fore/mid-brain,Midbrain,ENG2B,ENSDARG00000038868
+Fore/mid-brain,Midbrain,HER5,ENSDARG00000008796
+Fore/mid-brain,Midbrain,HER11,ENSDARG00000002707
+Fore/mid-brain,Midbrain,PAX2A,ENSDARG00000028148
+Fore/mid-brain,Telencephalon,FOXG1A,ENSDARG00000070769
+Fore/mid-brain,Telencephalon,EMX3,ENSDARG00000020417
+Fore/mid-brain,Optic cup,RX3,ENSDARG00000052893
+Fore/mid-brain,Optic cup,RX2,ENSDARG00000040321
+Fore/mid-brain,Optic cup,PAX6B,ENSDARG00000045936
+Fore/mid-brain,Ventral diencephalon,DBX1A,ENSDARG00000086393
+Fore/mid-brain,Ventral diencephalon,DBX1B,ENSDARG00000001859
+Fore/mid-brain,Ventral diencephalon,NKX2.2B,ENSDARG00000101549
+Fore/mid-brain,Dorsal diencephalon,LHX5,ENSDARG00000057936
+Fore/mid-brain,Dorsal diencephalon,PAX6A,ENSDARG00000103379
+Fore/mid-brain,Dorsal diencephalon,FOXD1,ENSDARG00000029179
+Fore/mid-brain,Dorsal diencephalon,OLIG3,ENSDARG00000074253
+Hindbrain,Rhombomeres 5&6,MAFBA,ENSDARG00000017121
+Hindbrain,Rhombomere 3,EGR2B,ENSDARG00000042826
+Hindbrain,Rhombomere 4,FGF8A,ENSDARG00000003399
+Hindbrain,Rhombomere 7,HOXD4A,ENSDARG00000059276
+Hindbrain,Rhombomere 7,HOXA3A,ENSDARG00000103862
+Non-neural ectoderm,Integument,FOXI3A,ENSDARG00000055926
+Non-neural ectoderm,Integument,FOXI3B,ENSDARG00000009550
+Non-neural ectoderm,Integument,MYB,ENSDARG00000053666
+Non-neural ectoderm,Integument,GCM2,ENSDARG00000045413
+Non-neural ectoderm,Neural plate border,CRABP2A,ENSDARG00000073978
+Non-neural ectoderm,Neural plate border,DLX3B,ENSDARG00000014626
+Non-neural ectoderm,Epidermis,GATA2A,ENSDARG00000059327
+Non-neural ectoderm,Epidermis,GATA3,ENSDARG00000016526
+Non-neural ectoderm,Epidermis,TBX2B,ENSDARG00000006120
+Non-neural ectoderm,Epidermis,CYP2K16,ENSDARG00000102981
+Pre-placodal ectoderm,Lens placode,PITX3,ENSDARG00000070069
+Pre-placodal ectoderm,Olfactory placode,FOXN4,ENSDARG00000010591
+Pre-placodal ectoderm,Olfactory placode,EBF2,ENSDARG00000042525
+Pre-placodal ectoderm,Olfactory placode,SIX3B,ENSDARG00000054879
+Pre-placodal ectoderm,Olfactory placode,DLX4B,ENSDARG00000071560
+Pre-placodal ectoderm,Adenohypophyseal placode,SIX3B,ENSDARG00000054879
+Pre-placodal ectoderm,Adenohypophyseal placode,DLX4B,ENSDARG00000071560
+Pre-placodal ectoderm,Adenohypophyseal placode,HESX1,ENSDARG00000060734
+Pre-placodal ectoderm,Epibranchail placode,FOXI1,ENSDARG00000104566
+Pre-placodal ectoderm,Epibranchail placode,PAX8,ENSDARG00000015879
+Pre-placodal ectoderm,Otic placode,ATOH1B,ENSDARG00000099564
+Pre-placodal ectoderm,Otic placode,TBX2B,ENSDARG00000006120
+Pre-placodal ectoderm,Otic placode,PAX2A,ENSDARG00000028148
+Pre-placodal ectoderm,Trigeminal placode,KLF17,ENSDARG00000038792
+Pre-placodal ectoderm,Trigeminal placode,IRX1A,ENSDARG00000101831
+Pre-placodal ectoderm,Trigeminal placode,P2RX3A,ENSDARG00000010477
+Non-blastoderm,EVL/Periderm,KRT18,ENSDARG00000018404
+Non-blastoderm,EVL/Periderm,KRT92,ENSDARG00000036834
+Non-blastoderm,EVL/Periderm,KRT4,ENSDARG00000017624
+Non-blastoderm,EVL/Periderm,KRT5,ENSDARG00000058371
+Non-blastoderm,EVL/Periderm,KRT17,ENSDARG00000094041
+Non-blastoderm,Primordial germ cells,DDX4,ENSDARG00000014373
+Non-blastoderm,Primordial germ cells,H1M,ENSDARG00000102892
+Non-blastoderm,Primordial germ cells,NANOS3,ENSDARG00000068255
+Non-blastoderm,Yolk Syncitial Layer,CYP11A1,ENSDARG00000002347
+Non-blastoderm,Yolk Syncitial Layer,MXTX2,ENSDARG00000015906
+Non-blastoderm,Yolk Syncitial Layer,HNF4A,ENSDARG00000021494

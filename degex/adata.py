@@ -227,7 +227,6 @@ def combine_timepoints(
         }
     """
     time_to_num = time_to_num_from_idx_to_time(idx_to_time)
-
     adata = ad.concat(
         [*adatas], 
         index_unique="_", merge="same", join='outer'

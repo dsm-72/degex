@@ -63,7 +63,7 @@ from degex.adata import (
 
 # %% ../nbs/05_preprocessing.ipynb 7
 def prepare_h5ad_file(filename:str, plot:bool=False) -> AnnData:
-    adata = sc.read_10x_h5(filename)
+    adata = sc.read_10x_h5(filename, gex_only = True)
     adata = add_gene_symbols_to_adata(adata)
     adata = add_gene_ids_to_adata(adata)
     adata = score_doublets(adata, plot)
