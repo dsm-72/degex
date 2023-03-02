@@ -52,6 +52,7 @@ import scipy
 import graphtools as gt
 import phate
 import magic
+import scprep
 
 # %% ../nbs/03_adata.ipynb 6
 def add_gene_symbols_to_adata(adata:AnnData) -> AnnData:
@@ -104,7 +105,7 @@ def remove_mitochondrial_genes(adata:AnnData) -> AnnData:
     adata
         for function chaining
     """
-    adata = adata[:, ~adata.var[VAR_MITO]]
+    adata = adata[:, ~(adata.var[VAR_MITO])]
     return adata
 
 def score_doublets(adata:AnnData, plot:bool=False, **kwargs) -> AnnData:   
@@ -322,9 +323,9 @@ def filter_by_cutoffs(
     """
     assert obs_key is not None
     if lower is not None:
-        adata[adata.obs[obs_key] > lower]
+        adata = adata[adata.obs[obs_key] > lower]
     if upper is not None:
-        adata[adata.obs[obs_key] < upper]
+        adata = adata[adata.obs[obs_key] < upper]
     if print_counts:
         print(adata.obs.batch.value_counts())
     return adata
@@ -412,6 +413,7 @@ def add_gene_detection_layer(adata:AnnData) -> AnnData:
     ).replace({True: 1, False: 0}))
     return adata
 
+
 def sqrt_library_size_normalize(adata:AnnData) -> AnnData:
     f"""
     Runs `sqrt(library_size_normalize(adata.X))` and stores
@@ -430,8 +432,8 @@ def sqrt_library_size_normalize(adata:AnnData) -> AnnData:
     # Normalise by library size and square-root transform
     adata = adata.copy()
     adata.X = scipy.sparse.csr_matrix(
-        sc.transform.sqrt(
-            sc.normalize.library_size_normalize(
+        scprep.transform.sqrt(
+            scprep.normalize.library_size_normalize(
                 adata.X.toarray()
             )
         )
@@ -457,7 +459,7 @@ def add_batch_mean_center_layer(adata:AnnData) -> AnnData:
     # Batch mean center before cell cycle scoring
     adata.raw = adata
     adata.X = scipy.sparse.csr_matrix(
-        sc.normalize.batch_mean_center(
+        scprep.normalize.batch_mean_center(
             adata.X.toarray(), 
             sample_idx = adata.obs[OBS_BATCH]
         )
@@ -494,13 +496,15 @@ def score_genes_cell_cycle_with_batch_mean_center_data(
     adata
         for function chaining
     """
-    sdata = adata.layers[LAYER_SCALED_NORMALIZED]
+    sdata = adata.copy()
+    sdata.X = np.array(adata.layers[LAYER_SCALED_NORMALIZED].todense())        
+    sdata.raw = adata
     # Get normalised counts back instead of mean centered values as pca will mean center
     sc.tl.score_genes_cell_cycle(sdata, s_genes=s_genes, g2m_genes=g2m_genes)
 
-    adata.obs.S_score = sdata.obs.S_score
-    adata.obs.G2M_score = sdata.obs.G2M_score
-    adata.obs.phase = sdata.obs.phase
+    adata.obs = adata.obs.join(sdata.obs.S_score)
+    adata.obs = adata.obs.join(sdata.obs.G2M_score)
+    adata.obs = adata.obs.join(sdata.obs.phase)
 
     return adata
 
@@ -560,7 +564,7 @@ def select_hvg_per_batch(
     # Select highly variable genes from any batch
     hvg_all = []
     for batch in adata.obs[OBS_BATCH].unique():
-        normalised, hgv_vars = sc.select.highly_variable_genes(
+        normalised, hgv_vars = scprep.select.highly_variable_genes(
             adata[adata.obs[OBS_BATCH] == batch].X.toarray(), 
             adata[adata.obs[OBS_BATCH] == batch].var.index, 
             **hvg_kwargs
@@ -664,10 +668,10 @@ def run_pca(
     else:
         x = adata.X.toarray()
 
-    pcs, svs = sc.reduce.pca(x, **pca_kwargs)
+    pcs, svs = scprep.reduce.pca(x, **pca_kwargs)
     adata.obsm[emb_key] = pcs
     if plot_scree:
-        sc.plot.scree_plot(svs, cumulative=False)
+        scprep.plot.scree_plot(svs, cumulative=False)
     return adata
 
 def run_pca_on_hvg(
@@ -677,7 +681,7 @@ def run_pca_on_hvg(
 ) -> AnnData:
     return run_pca(
         adata, pca_kwargs, plot_scree,
-        EMB_PCA_HVG, adata.var.highly_variable
+        EMB_PCA_HVG, adata.var[VAR_HIGHLY_VARIABLE]
     )
 
 # %% ../nbs/03_adata.ipynb 17
@@ -703,10 +707,7 @@ def run_phate_using_g(
         if pca_key not in adata.obsm:
             raise ValueError(f'{pca_key} not in adata.obsm')
         
-        g = gt.Graph(
-            adata.obsm[pca_key], n_pca=None, 
-            **g_kwargs
-        )
+        g = gt.Graph(adata.obsm[pca_key], **g_kwargs)
 
     phate_op = phate.PHATE(**phate_kwargs)
     data_phate = phate_op.fit_transform(g)

@@ -57,7 +57,7 @@ VAR_MITO = 'mito'
 VAR_RIBO = 'ribo'
 
 # Type Alias for adata.var field
-VAR_HIGHLY_VARIABLE = 'ribo'
+VAR_HIGHLY_VARIABLE = 'highly_variable'
 
 # Human Transcription Factor key in adata.var
 VAR_HUMAN_TF = 'HumanTFs'

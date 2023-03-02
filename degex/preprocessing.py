@@ -81,7 +81,7 @@ def filter_pipeline(
     min_cells:int=5
 ) -> AnnData:    
     adata = apply_filter_by_cutoffs(adata, cutoff_specs)
-    adata = sc.pp.filter_genes(adata, min_cells=min_cells)
+    sc.pp.filter_genes(adata, min_cells=min_cells)
     adata = remove_mitochondrial_genes(adata)    
     return adata
 
