@@ -78,11 +78,13 @@ def filter_pipeline(
         CutoffSpecification('pct_counts_ribo', None, 15),
         CutoffSpecification('doublet_scores', None, 0.4),
     ],
-    min_cells:int=5
+    min_cells:int=5,
+    remove_mt_genes:bool=False,
 ) -> AnnData:    
     adata = apply_filter_by_cutoffs(adata, cutoff_specs)
     sc.pp.filter_genes(adata, min_cells=min_cells)
-    adata = remove_mitochondrial_genes(adata)    
+    if remove_mt_genes:
+        adata = remove_mitochondrial_genes(adata)    
     return adata
 
 def normalization_pipeline(
