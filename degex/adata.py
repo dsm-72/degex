@@ -703,7 +703,7 @@ def run_phate_using_g(
         pca_key = emb_key.replace('phate', 'pca')        
         print((
             f'g is None. Will attempt to calculate with'
-            f' PCA stored in adata.obsm{pca_key}.'
+            f' PCA stored in adata.obsm[{pca_key}].'
         ))
 
         if pca_key not in adata.obsm:
