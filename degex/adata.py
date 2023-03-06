@@ -639,15 +639,17 @@ def subset_markers(
     marker_name:str='marker',
     other_name:str='other'
 ) -> AnnData:
-    u_cut = pd.Series([True for t in adata.obs])
-    l_cut = pd.Series([True for t in adata.obs])
+    u_cut = pd.Series(np.repeat(True, adata.obs.shape[0]))
+    l_cut = pd.Series(np.repeat(True, adata.obs.shape[0]))
     if upper is not None:
         u_cut = (adata.obs[score_key] < upper)
 
     if lower is not None:
         l_cut = (lower < adata.obs[score_key])
+    
+    found = pd.Series(np.logical_and(u_cut.values, l_cut.values), index=adata.obs[score_key].index, name=obs_key)
 
-    adata.obs[obs_key] = (u_cut & l_cut).replace({True: marker_name, False: other_name})
+    adata.obs[obs_key] = (found).replace({True: marker_name, False: other_name})
     return adata
 
 
