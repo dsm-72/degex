@@ -21,13 +21,17 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import scprep, scipy as sp, phate
 
 class BranchPointPredictor(BaseEstimator, TransformerMixin):
-    def __init__(self, phate_op):
+    def __init__(
+        self, 
+        phate_op: phate.PHATE, # a trained PHATE operator
+        extrema_percentile:float = 50, # percentile to mask when calculating extrema
+        diffusion_iterations:int=20 # number of iterations to diffuse
+    ):
+        
         self.phate_op = phate_op
-
-        self.diff_op = phate_op.diff_op
-        self.optimal_t = phate_op.optimal_t
-     
-            
+        self.extrema_percentile = extrema_percentile
+        self.diffusion_iterations = diffusion_iterations
+                      
     def fit(self, X, y=None):
         self.diffuse_dirac_for_end_points()
         self.assign_branches(X)
@@ -37,16 +41,163 @@ class BranchPointPredictor(BaseEstimator, TransformerMixin):
     
     def transform(self, X):
         return self.classes
-        return X
+    
+
+    # NOTE: these two properties are for convenience of the developer
+    # and they just expose the underlying PHATE operator values
+    @property
+    def diff_op(self):
+        try:
+            return self.phate_op.diff_op
+        except AttributeError:
+            return None
 
     @property
+    def optimal_t(self):
+        try:
+            return self.phate_op.optimal_t
+        except AttributeError:
+            return None
+    
+
+    # NOTE: listing all properties up top for readability
+    @property
     def dmap(self):
+        '''
+        Returns the diffusion map calculated from the diffusion operator
+        '''
         try:
             return self._dmap
         except AttributeError:        
             self._calc_dmap()            
             return self._dmap 
+
+    @property
+    def n_use(self):
+        '''
+        The number of eigenvectors in the diffusion map to use
+        for downstream analyses
+        '''
+        try:
+            return self._n_use
+        except AttributeError:        
+            self._calc_num_to_consider()            
+            return self._n_use 
+
+    @property
+    def most_distinct_points(self):
+        '''
+        The most distinct points **prior** to downstream analysis.
+        These are the extrema.
+        '''
+        try:
+            return self._most_distinct_points
+        except AttributeError:        
+            self._calc_extrema()          
+            return self._most_distinct_points
        
+    @property
+    def is_landmarked(self):
+        '''
+        Whether or not the graph in the PHATE operator is a Landmark Graph
+        which matters when reconstructing class labels
+        '''
+        return isinstance(self.phate_op.graph, graphtools.graphs.kNNLandmarkGraph)
+    
+    # NOTE: these two properties are for handling reconstruction from the landmark operator
+    # back to the original data space.
+    @property
+    def pmn(self):
+        try:
+            return self.phate_op.graph.transitions
+        except Exception:        
+            return None
+        
+    @property
+    def pnm(self):
+        try:
+            return self.phate_op.graph._data_transitions()
+        except Exception:        
+            return None
+        
+    @property
+    def n_rows(self):
+        return self.pmn.shape[0] if self.pmn is not None else self.diff_op.shape[0]
+    
+    @property
+    def nn_dist(self):
+        '''
+        Nearest Neighbor distance matrix calculated on diffusion operator
+        '''
+        try:
+            return self._nn_dist
+        except AttributeError:
+            self._knn_on_diff_op()
+            return self._nn_dist
+        
+    @property
+    def nn_idxs(self):
+        '''
+        Nearest Neighbor indicies calculated on diffusion operator
+        '''
+        try:
+            return self._nn_idxs
+        except AttributeError:
+            self._knn_on_diff_op()
+            return self._nn_idxs
+        
+    @property
+    def n_nbrs(self):
+        try:
+            return self._n_nbrs
+        except AttributeError:
+            self.max_likelihood_pointwise_dimensionality_est()
+            return self._n_nbrs
+    
+    @property
+    def nbrs_dim_est(self):
+        try:
+            return self._nbrs_dim_est
+        except AttributeError:
+            self.max_likelihood_pointwise_dimensionality_est()
+            return self._nbrs_dim_est
+    
+    @property
+    def most_distinct_points_adjusted(self):
+        try:
+            return self._most_distinct_points_adjusted
+        except AttributeError:
+            self.max_likelihood_pointwise_dimensionality_est()
+            return self._most_distinct_points_adjusted
+
+    @property
+    def classes(self):
+        '''
+        Branch class labels
+        '''
+        try:
+            return self._classes
+        except AttributeError:
+            self.diffuse_dirac_for_end_points()
+            return self._classes
+        
+    @property
+    def branch_classes(self):
+        try:
+            return self._branch_classes
+        except AttributeError:
+            self.assign_branches(self.phate_op.X)
+            return self._branch_classes
+
+    @property
+    def branch_points(self):
+        try:
+            return self._branch_points
+        except AttributeError:
+            self.diffuse_dirac_for_end_points()
+            return self._branch_points
+    
+    # NOTE: sets property dmap
     def _calc_dmap(self, t=None):
         if t is None:
             t = self.optimal_t
@@ -66,15 +217,8 @@ class BranchPointPredictor(BaseEstimator, TransformerMixin):
         self.evecs = evecs
         self._dmap = evecs   
         return evecs
-    
-    @property
-    def n_use(self):
-        try:
-            return self._n_use
-        except AttributeError:        
-            self._calc_num_to_consider()            
-            return self._n_use 
-        
+
+    # NOTE: sets property n_use      
     def _calc_num_to_consider(self):
         dmap = self.dmap
         evals = self.evals
@@ -90,16 +234,11 @@ class BranchPointPredictor(BaseEstimator, TransformerMixin):
         self._n_use = n_evecs
         return n_evecs
     
-    @property
-    def most_distinct_points(self):
-        try:
-            return self._most_distinct_points
-        except AttributeError:        
-            self._calc_extrema()          
-            return self._most_distinct_points 
-    
-
+    # NOTE: sets property most_distinct_points
     def _calc_extrema(self):
+        # NOTE: these functions are equivalent, but
+        # v2 is used in latest version on GitHub and
+        # although v1 looks cleaner
         return self.__calc_extrema_v2()
         return self.__calc_extrema_v1()
     
@@ -110,7 +249,7 @@ class BranchPointPredictor(BaseEstimator, TransformerMixin):
         dmap = dmap[:, 1:].copy()
 
         # Mask lower 50% abs val
-        lower_half_abs = np.percentile(np.abs(dmap), 50)
+        lower_half_abs = np.percentile(np.abs(dmap), self.extrema_percentile)
         dmap[np.abs(dmap) < lower_half_abs] = 0
 
         max_idxs = dmap.argmax(axis=0)
@@ -144,7 +283,7 @@ class BranchPointPredictor(BaseEstimator, TransformerMixin):
             cur_eigvec = np.copy(dmap[:,i+1])
             # Sometimes the eigvectors are skewed towards one side (much more possitive values than negative 
             # values and vice versa). This part ensures only the extrema on the more significant side is taken.            
-            lower_half_abs = np.percentile(np.abs(cur_eigvec), 50)
+            lower_half_abs = np.percentile(np.abs(cur_eigvec), self.extrema_percentile)
             cur_eigvec[np.abs(cur_eigvec) < lower_half_abs] = 0
 
             max_eig = np.argmax(cur_eigvec)
@@ -160,47 +299,7 @@ class BranchPointPredictor(BaseEstimator, TransformerMixin):
         self._most_distinct_points = most_distinct_points
         return most_distinct_points        
 
-    @property
-    def is_landmarked(self):        
-        return isinstance(self.phate_op.graph, graphtools.graphs.kNNLandmarkGraph)
-    
-     
-    @property
-    def pmn(self):
-        try:
-            return self.phate_op.graph.transitions
-        except Exception:        
-            return None
         
-    @property
-    def pnm(self):
-        try:
-            return self.phate_op.graph._data_transitions()
-        except Exception:        
-            return None
-        
-    
-    @property
-    def n_rows(self):
-        return self.pmn.shape[0] if self.pmn is not None else self.diff_op.shape[0]
-    
-    @property
-    def nn_dist(self):
-        try:
-            return self._nn_dist
-        except AttributeError:
-            self._knn_on_diff_op()
-            return self._nn_dist
-        
-    @property
-    def nn_idxs(self):
-        try:
-            return self._nn_idxs
-        except AttributeError:
-            self._knn_on_diff_op()
-            return self._nn_idxs
-        
-    
     def _knn_on_diff_op(self):
         # NOTE: using KNN on diff_map is not invertable
         # i.e. need to revert landmark graph here!
@@ -235,33 +334,7 @@ class BranchPointPredictor(BaseEstimator, TransformerMixin):
         self._nn_idxs = nn_indices
         return nn_distances, nn_indices
 
-    @property
-    def n_nbrs(self):
-        try:
-            return self._n_nbrs
-        except AttributeError:
-            self.max_likelihood_pointwise_dimensionality_est()
-            return self._n_nbrs
-    
-    @property
-    def nbrs_dim_est(self):
-        try:
-            return self._nbrs_dim_est
-        except AttributeError:
-            self.max_likelihood_pointwise_dimensionality_est()
-            return self._nbrs_dim_est
-    
-    @property
-    def most_distinct_points_adjusted(self):
-        try:
-            return self._most_distinct_points_adjusted
-        except AttributeError:
-            self.max_likelihood_pointwise_dimensionality_est()
-            return self._most_distinct_points_adjusted
-    
     def max_likelihood_pointwise_dimensionality_est(self):
-        pnm = self.pnm
-        pmn = self.pmn
         n_rows = self.n_rows
         nn_dist = self.nn_dist
         nn_idxs = self.nn_idxs 
@@ -293,21 +366,6 @@ class BranchPointPredictor(BaseEstimator, TransformerMixin):
         self._nbrs_dim_est = nbrs_dim_est
         return n_nbrs, nbrs_dim_est
     
-    @property
-    def classes(self):
-        try:
-            return self._classes
-        except AttributeError:
-            self.diffuse_dirac_for_end_points()
-            return self._classes
-    @property
-    def branch_points(self):
-        try:
-            return self._branch_points
-        except AttributeError:
-            self.diffuse_dirac_for_end_points()
-            return self._branch_points
-    
     def diffuse_dirac_for_end_points(self):        
         n_nbrs = self.n_nbrs        
         nbrs_dim_est = self.nbrs_dim_est
@@ -337,7 +395,7 @@ class BranchPointPredictor(BaseEstimator, TransformerMixin):
 
             branch_point_dim_est_avg_cache = -float('inf')
 
-            for it in range(20):
+            for it in range(self.diffusion_iterations):
                 branch_from_end_point = diff_op_t[:, cur_end_point]
 
                 branch_max = np.max(branch_from_end_point)
@@ -399,29 +457,7 @@ class BranchPointPredictor(BaseEstimator, TransformerMixin):
         self._classes = classes
         self._branch_points = branch_points
         return branch_points
-    
-    def plot_branchs(self, emb):
-        most_distinct_points = self.most_distinct_points_adjusted
-        branch_points = self.branch_points
-        # Plot by class with end points and branch points
-        classes = self.classes        
-        ax = scprep.plot.scatter2d(emb, c=classes)
-        plot_numbers = np.repeat("", emb.shape[0])
-        plot_numbers[most_distinct_points] = np.arange(most_distinct_points.shape[0]) + 1
-        plot_numbers[branch_points] = "*"
-        bbox_props = dict(boxstyle="circle,pad=0.3", fc="w", ec="r", lw=2)
-        
-        for i, txt in enumerate(plot_numbers):
-            ax.annotate(txt, (emb[i][0], emb[i][1]), size=15, bbox=bbox_props)
 
-    @property
-    def branch_classes(self):
-        try:
-            return self._branch_classes
-        except AttributeError:
-            self.assign_branches(self.phate_op.X)
-            return self._branch_classes
-    
     def assign_branches(self, emb):
         ###################
         # ASSIGN BRANCHES #
@@ -451,6 +487,20 @@ class BranchPointPredictor(BaseEstimator, TransformerMixin):
         branch_classes = list(zip(mdp_1, mdp_2))
         branch_classes = [str(sorted(branch_class)) for branch_class in branch_classes]
         self._branch_classes = branch_classes 
+
+    def plot_branchs(self, emb):
+        most_distinct_points = self.most_distinct_points_adjusted
+        branch_points = self.branch_points
+        # Plot by class with end points and branch points
+        classes = self.classes        
+        ax = scprep.plot.scatter2d(emb, c=classes)
+        plot_numbers = np.repeat("", emb.shape[0])
+        plot_numbers[most_distinct_points] = np.arange(most_distinct_points.shape[0]) + 1
+        plot_numbers[branch_points] = "*"
+        bbox_props = dict(boxstyle="circle,pad=0.3", fc="w", ec="r", lw=2)
+        
+        for i, txt in enumerate(plot_numbers):
+            ax.annotate(txt, (emb[i][0], emb[i][1]), size=15, bbox=bbox_props)
 
     def plot_branch_classes(self, emb):
         branch_classes = self.branch_classes
