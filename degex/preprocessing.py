@@ -44,6 +44,7 @@ import scipy
 import graphtools as gt
 import phate
 import magic
+import warnings
 
 # %% ../nbs/05_preprocessing.ipynb 6
 from degex.adata import (
@@ -63,9 +64,16 @@ from degex.adata import (
 
 # %% ../nbs/05_preprocessing.ipynb 7
 def prepare_h5ad_file(filename:str, plot:bool=False) -> AnnData:
-    adata = sc.read_10x_h5(filename, gex_only = True)
+    try:
+        adata = sc.read_10x_h5(filename, gex_only = True)
+    except ValueError:
+        warnings.warn('Failed to use sc.read_10x_h5 to load file. Using read_h5ad as fallback. Is your data from 10x?')
+        adata = sc.read_h5ad(filename)
     adata = add_gene_symbols_to_adata(adata)
-    adata = add_gene_ids_to_adata(adata)
+    try:
+        adata = add_gene_ids_to_adata(adata)
+    except KeyError:
+        warnings.warn(f'Failed to find a feature named {VAR_GENE_IDS} in adata.var. Not setting adata.var_names to `{VAR_GENE_IDS}`.')
     adata = score_doublets(adata, plot)
     return adata
 

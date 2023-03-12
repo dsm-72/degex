@@ -189,6 +189,8 @@ from degex.utils import (
 def combine_timepoints(
     *adatas:AnnDatas, 
     idx_to_time:dict,
+    idx_to_batch:dict=None,
+    batch_to_timepoint:dict=None,
     print_counts:bool=False
 ) -> AnnData:    
     """
@@ -204,6 +206,12 @@ def combine_timepoints(
     idx_to_time
         map of {int|str: str} for indicies to human friendly 
         time values.
+
+    idx_to_batch
+        map of {int|str: str} for indicies to batch
+
+    batch_to_timepoint
+        map of {str: int} to map each batch (from `idx_to_time` or `idx_to_batch`) to a timepoint
 
     print_counts
         Whether or not to print batched value counts.
@@ -236,10 +244,10 @@ def combine_timepoints(
     adata.obs[OBS_BATCH] = adata.obs.index.astype(str).str[-1]
 
     adata.obs[OBS_BATCH] = adata.obs[OBS_BATCH]\
-        .replace(idx_to_time)
+        .replace(idx_to_time if idx_to_batch is None else idx_to_batch)
     
     adata.obs[OBS_TIMEPOINT] = adata.obs[OBS_BATCH]\
-        .replace(time_to_num)
+        .replace(time_to_num if batch_to_timepoint is None else batch_to_timepoint)
 
     if print_counts:
         print(adata.obs[OBS_BATCH].value_counts())
