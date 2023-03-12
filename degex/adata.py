@@ -54,6 +54,9 @@ import phate
 import magic
 import scprep
 
+# %% ../nbs/03_adata.ipynb 6
+from .utils import _arr_toarray, adata_X_toarray
+
 # %% ../nbs/03_adata.ipynb 7
 def add_gene_symbols_to_adata(adata:AnnData) -> AnnData:
     """
@@ -378,6 +381,7 @@ def apply_filter_by_cutoffs(
     return adata
 
 # %% ../nbs/03_adata.ipynb 12
+from .utils import _arr_toarray, adata_X_toarray
 def add_prenormalization_layer(adata:AnnData) -> AnnData:
     f"""
     Stores `adata.X` to `layers[{LAYER_PRENORM}]`
