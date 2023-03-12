@@ -54,7 +54,7 @@ import phate
 import magic
 import scprep
 
-# %% ../nbs/03_adata.ipynb 6
+# %% ../nbs/03_adata.ipynb 7
 def add_gene_symbols_to_adata(adata:AnnData) -> AnnData:
     """
     Enfoces that `adata.var` names are unique and adds 
@@ -139,7 +139,7 @@ def score_doublets(adata:AnnData, plot:bool=False, **kwargs) -> AnnData:
     return adata
 
 
-# %% ../nbs/03_adata.ipynb 7
+# %% ../nbs/03_adata.ipynb 8
 def add_gene_annotations(
     adata:AnnData,
     annotation_file:str
@@ -183,7 +183,7 @@ def add_gene_annotations(
     adata.var_names_make_unique()
     return adata
 
-# %% ../nbs/03_adata.ipynb 8
+# %% ../nbs/03_adata.ipynb 9
 from degex.utils import (
     time_to_num_from_idx_to_time
 )
@@ -254,7 +254,7 @@ def combine_timepoints(
         print(adata.obs[OBS_BATCH].value_counts())
     return adata
 
-# %% ../nbs/03_adata.ipynb 9
+# %% ../nbs/03_adata.ipynb 10
 def calc_qc_stats(adata:AnnData) -> AnnData:
     f"""
     Calculates {VAR_MITO} and {VAR_RIBO} qc metrics
@@ -291,7 +291,7 @@ def calc_qc_stats(adata:AnnData) -> AnnData:
     )
     return adata
 
-# %% ../nbs/03_adata.ipynb 10
+# %% ../nbs/03_adata.ipynb 11
 def filter_by_cutoffs(
     adata:AnnData, 
     lower:float=None, 
@@ -377,7 +377,7 @@ def apply_filter_by_cutoffs(
 
     return adata
 
-# %% ../nbs/03_adata.ipynb 11
+# %% ../nbs/03_adata.ipynb 12
 def add_prenormalization_layer(adata:AnnData) -> AnnData:
     f"""
     Stores `adata.X` to `layers[{LAYER_PRENORM}]`
@@ -417,7 +417,7 @@ def add_gene_detection_layer(adata:AnnData) -> AnnData:
     # Add layer of gene detection
     adata.layers[LAYER_DETECTED] = scipy.sparse.csr_matrix(
         pd.DataFrame(
-        (adata.layers[LAYER_PRENORM].toarray() > 0), 
+        (_arr_toarray(adata.layers[LAYER_PRENORM]) > 0), 
         columns = adata.var.index, index=adata.obs.index
     ).replace({True: 1, False: 0}))
     return adata
@@ -443,13 +443,13 @@ def sqrt_library_size_normalize(adata:AnnData) -> AnnData:
     adata.X = scipy.sparse.csr_matrix(
         scprep.transform.sqrt(
             scprep.normalize.library_size_normalize(
-                adata.X.toarray()
+                adata_X_toarray(adata)                
             )
         )
     )
     return adata
 
-# %% ../nbs/03_adata.ipynb 12
+# %% ../nbs/03_adata.ipynb 13
 def add_batch_mean_center_layer(adata:AnnData) -> AnnData:
     f"""
     Runs `batch_mean_center(adata.X)` and stores
@@ -468,8 +468,8 @@ def add_batch_mean_center_layer(adata:AnnData) -> AnnData:
     # Batch mean center before cell cycle scoring
     adata.raw = adata
     adata.X = scipy.sparse.csr_matrix(
-        scprep.normalize.batch_mean_center(
-            adata.X.toarray(), 
+        scprep.normalize.batch_mean_center(        
+            adata_X_toarray(adata),            
             sample_idx = adata.obs[OBS_BATCH]
         )
     )
@@ -549,7 +549,7 @@ def load_human_genes(
         genes = adata.var.index[adata.var[VAR_HUMAN_GENE_SYMBOL].isin(genes)]
         return genes
 
-# %% ../nbs/03_adata.ipynb 13
+# %% ../nbs/03_adata.ipynb 14
 def select_hvg_per_batch(
     adata:AnnData,
     hvg_kwargs:dict=dict(cutoff=None, percentile=90)
@@ -574,7 +574,7 @@ def select_hvg_per_batch(
     hvg_all = []
     for batch in adata.obs[OBS_BATCH].unique():
         normalised, hgv_vars = scprep.select.highly_variable_genes(
-            adata[adata.obs[OBS_BATCH] == batch].X.toarray(), 
+            adata_X_toarray(adata[adata.obs[OBS_BATCH] == batch]),
             adata[adata.obs[OBS_BATCH] == batch].var.index, 
             **hvg_kwargs
         )
@@ -586,7 +586,7 @@ def select_hvg_per_batch(
     adata.var[VAR_HIGHLY_VARIABLE] = adata.var.index.isin(hvg_all)
     return adata
 
-# %% ../nbs/03_adata.ipynb 14
+# %% ../nbs/03_adata.ipynb 15
 def add_tf_annotations_from_csv(
     adata:AnnData, filename:str,
     tf_key:str, ensemble_key:str,
@@ -620,7 +620,7 @@ def add_mouse_tfs_from_csv(
         VAR_MOUSE_ENSEMBLE_ID, print_counts
     )
 
-# %% ../nbs/03_adata.ipynb 15
+# %% ../nbs/03_adata.ipynb 16
 from scipy.stats import zscore
 def zscore_markers_in_layer(
     adata:AnnData,
@@ -631,7 +631,7 @@ def zscore_markers_in_layer(
     # Score cells based on select marker expression (sum of zscores of smoothed counts)
     col_subset = adata.var.index.isin(markers)
     df_markers = pd.DataFrame(
-        adata.layers[layer_key][:, col_subset].toarray(), 
+        _arr_toarray(adata.layers[layer_key][:, col_subset]),        
         columns = adata.var.index[col_subset],
         index = adata.obs.index
     )
@@ -662,7 +662,7 @@ def subset_markers(
     return adata
 
 
-# %% ../nbs/03_adata.ipynb 16
+# %% ../nbs/03_adata.ipynb 17
 def run_pca(
     adata:AnnData,
     pca_kwargs:dict=dict(n_components=100),
@@ -674,10 +674,10 @@ def run_pca(
     pca_kwargs['return_singular_values'] = True
     pca_kwargs['seed'] = 3
 
-    if col_subset is not None:
-        x = adata[:, col_subset].X.toarray()
+    if col_subset is not None:        
+        x = adata_X_toarray(adata[:, col_subset])
     else:
-        x = adata.X.toarray()
+        x = adata_X_toarray(adata)        
 
     pcs, svs = scprep.reduce.pca(x, **pca_kwargs)
     adata.obsm[emb_key] = pcs
@@ -695,7 +695,7 @@ def run_pca_on_hvg(
         EMB_PCA_HVG, adata.var[VAR_HIGHLY_VARIABLE]
     )
 
-# %% ../nbs/03_adata.ipynb 17
+# %% ../nbs/03_adata.ipynb 18
 def run_phate_using_g(
     adata:AnnData,    
     g: Graph = None,
@@ -736,7 +736,7 @@ def run_phate_on_hvg(
         adata, g, phate_kwargs, g_kwargs, emb_key
     )
 
-# %% ../nbs/03_adata.ipynb 18
+# %% ../nbs/03_adata.ipynb 19
 def run_magic(
     adata:AnnData, g:Graph,
     knn_max:int = 60
