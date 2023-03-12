@@ -71,7 +71,8 @@ def add_gene_symbols_to_adata(adata:AnnData) -> AnnData:
         for function chaining
     """
     adata.var_names_make_unique()
-    adata.var[VAR_GENE_SYMBOL] = adata.var_names
+    if VAR_GENE_SYMBOL not in adata.var:
+        adata.var[VAR_GENE_SYMBOL] = adata.var_names
     return adata
 
 def add_gene_ids_to_adata(adata:AnnData) -> AnnData:
