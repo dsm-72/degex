@@ -55,7 +55,7 @@ import magic
 import scprep
 
 # %% ../nbs/03_adata.ipynb 6
-from .utils import _arr_toarray, adata_X_toarray
+from .utils import arr_toarray, adata_X_toarray
 
 # %% ../nbs/03_adata.ipynb 7
 def add_gene_symbols_to_adata(adata:AnnData) -> AnnData:
@@ -381,7 +381,7 @@ def apply_filter_by_cutoffs(
     return adata
 
 # %% ../nbs/03_adata.ipynb 12
-from .utils import _arr_toarray, adata_X_toarray
+from .utils import arr_toarray, adata_X_toarray
 def add_prenormalization_layer(adata:AnnData) -> AnnData:
     f"""
     Stores `adata.X` to `layers[{LAYER_PRENORM}]`
@@ -421,7 +421,7 @@ def add_gene_detection_layer(adata:AnnData) -> AnnData:
     # Add layer of gene detection
     adata.layers[LAYER_DETECTED] = scipy.sparse.csr_matrix(
         pd.DataFrame(
-        (_arr_toarray(adata.layers[LAYER_PRENORM]) > 0), 
+        (arr_toarray(adata.layers[LAYER_PRENORM]) > 0), 
         columns = adata.var.index, index=adata.obs.index
     ).replace({True: 1, False: 0}))
     return adata
@@ -635,7 +635,7 @@ def zscore_markers_in_layer(
     # Score cells based on select marker expression (sum of zscores of smoothed counts)
     col_subset = adata.var.index.isin(markers)
     df_markers = pd.DataFrame(
-        _arr_toarray(adata.layers[layer_key][:, col_subset]),        
+        arr_toarray(adata.layers[layer_key][:, col_subset]),        
         columns = adata.var.index[col_subset],
         index = adata.obs.index
     )
