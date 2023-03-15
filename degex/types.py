@@ -21,6 +21,7 @@ collections.MutableMapping = collections.abc.MutableMapping
 # %% ../nbs/01_types.ipynb 4
 import anndata as ad
 import graphtools as gt
+import pandas as pd, numpy as np
 
 from typing import (
     TypeAlias, List, 
