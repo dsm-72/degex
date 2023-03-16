@@ -646,15 +646,40 @@ class GrangerCausality(BaseEstimator):
         return self.scaler.inverse_transform(df)
     
     def plot_df_org(self, show_all_yticks:bool=True):
-        fig = plt.figure(figsize=(12, 8))
-        ax = sns.clustermap(
+        '''
+        Returns
+        -------
+        fig : matplotlib.pyplot.Figure
+        ax : matplotlib.pyplot.Axis
+        ClusterMap : seaborn.ClusterMap
+        '''
+        fig = plt.figure(figsize=(12, 12))
+        ax = fig.add_subplot(1,1,1)
+
+        options = {}
+        if show_all_yticks:
+            options['yticklabels'] = show_all_yticks
+
+        cstrmp = sns.clustermap(
             self.df_org, cmap='inferno', robust=True,
-            col_cluster=False,  yticklabels=show_all_yticks
+            col_cluster=False, ax=ax, **options
         )
-        return ax
+        return fig, ax, cstrmp
     
     def plot_df_res(self, show_all_yticks:bool=True):
-        fig = plt.figure(figsize=(12, 8))
-        ax = sns.clustermap(self.df_res)
-        return ax
+        '''
+        Returns
+        -------
+        fig : matplotlib.pyplot.Figure
+        ax : matplotlib.pyplot.Axis
+        ClusterMap : seaborn.ClusterMap
+        '''
+        fig = plt.figure(figsize=(12, 12))
+        ax = fig.add_subplot(1,1,1)
+        options = {}
+        if show_all_yticks:
+            options['yticklabels'] = show_all_yticks
+
+        cstrmp = sns.clustermap(self.df_res, ax=ax, **options)
+        return fig, ax, cstrmp
 
