@@ -21,7 +21,7 @@ import pandas as pd, numpy as np
 import importlib, matplotlib as mpl, matplotlib.pyplot as plt, seaborn as sns
 
 from joblib import Parallel, delayed
-from typing import TypeAlias, List, Sequence, Tuple, Union
+from typing import TypeAlias, List, Sequence, Tuple, Union, Optional
 from .types import SeriesLike
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import StandardScaler
@@ -645,7 +645,7 @@ class GrangerCausality(BaseEstimator):
             raise ValueError
         return self.scaler.inverse_transform(df)
     
-    def plot_df_org(self, show_all_yticks:bool=True):
+    def plot_df_org(self, show_all_yticks:bool=True, **kwargs):
         '''
         Returns
         -------
@@ -653,33 +653,21 @@ class GrangerCausality(BaseEstimator):
         ax : matplotlib.pyplot.Axis
         ClusterMap : seaborn.ClusterMap
         '''
-        fig = plt.figure(figsize=(12, 12))
-        ax = fig.add_subplot(1,1,1)
-
-        options = {}
-        if show_all_yticks:
-            options['yticklabels'] = show_all_yticks
-
-        cstrmp = sns.clustermap(
-            self.df_org, cmap='inferno', robust=True,
-            col_cluster=False, ax=ax, **options
-        )
-        return fig, ax, cstrmp
+        options = dict(cmap='inferno', robust=True, col_cluster=False, yticklabels=show_all_yticks)
+        options.update(kwargs)
+        cstrmp = sns.clustermap(self.df_org, **options)
+        return cstrmp
     
-    def plot_df_res(self, show_all_yticks:bool=True):
+    def plot_df_res(self, show_all_yticks:bool=True, **kwargs):
         '''
         Returns
         -------
         fig : matplotlib.pyplot.Figure
         ax : matplotlib.pyplot.Axis
         ClusterMap : seaborn.ClusterMap
-        '''
-        fig = plt.figure(figsize=(12, 12))
-        ax = fig.add_subplot(1,1,1)
-        options = {}
-        if show_all_yticks:
-            options['yticklabels'] = show_all_yticks
-
-        cstrmp = sns.clustermap(self.df_res, ax=ax, **options)
-        return fig, ax, cstrmp
+        '''           
+        options = dict(yticklabels=show_all_yticks)
+        options.update(kwargs)
+        cstrmp = sns.clustermap(self.df_res, **options)
+        return cstrmp
 
