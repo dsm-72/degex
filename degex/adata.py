@@ -205,7 +205,7 @@ def stack(
 def stack_batchs(
     *adatas: AnnDatas, 
     idx_to_time: dict,
-    idx_to_batch: dict=None,
+    idx_to_batch: dict = None,
     batch_to_timepoint: dict = None,
     print_counts: bool = False
 ) -> AnnData:    
@@ -256,7 +256,7 @@ def stack_batchs(
     replace_batch = idx_to_time if idx_to_batch is None else idx_to_batch
     replace_times = time_to_num if batch_to_timepoint is None else batch_to_timepoint
 
-    adata = stack(*adatas, BATCH, replace=replace_batch)
+    adata = stack(*adatas, key=BATCH, replace=replace_batch)
     adata.obs[TIMEPOINT] = adata.obs[BATCH].replace(replace_times)
     
     if print_counts:
@@ -268,13 +268,13 @@ QC_VARS = dict()
 QC_VARS[MITO] = ('mt-', )
 QC_VARS[RIBO] = ('rps', 'rpl')
 
-def var_starts_with_pattern(name:str, patterns: Optional[Sequence[str]] = None) -> Tuple[str, tuple]:
+def var_starts_with_pattern(name:str, patterns: Optional[Sequence[str]] = None) -> tuple:
     if patterns is None:
         patterns = (f'{name.lower()}_', )
-    return name, patterns
+    return patterns
 
 def make_var_starts_with(var_starts_with: Optional[Dict[str, tuple]] = dict()):
-    return {k: var_starts_with_pattern(v) for k, v in var_starts_with.items()}
+    return {k: var_starts_with_pattern(k, v) for k, v in var_starts_with.items()}
 
 
 def calc_qc_stats(
