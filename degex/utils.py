@@ -15,36 +15,10 @@ collections.MutableSet = collections.abc.MutableSet
 collections.MutableMapping = collections.abc.MutableMapping
 
 # %% ../nbs/02_utils.ipynb 4
-from degex.types import (
-    AnnData, AnnDatas, Graph, SeriesLike,
-    VAR_HUMAN_TF, VAR_MOUSE_TF,
-    VAR_HUMAN_ENSEMBLE_ID, VAR_MOUSE_ENSEMBLE_ID,
-    LAYER_PRENORM, LAYER_DETECTED,
-    LAYER_SCALED_NORMALIZED, EMB_MAGIC,
-    EMB_PCA, EMB_PCA_HVG,
-    EMB_PHATE, EMB_PHATE_HVG,
-    CUTOFF_KIND, CUTOFF_SHORTHAND_TO_OBS_KEYS,
-    CutoffSpecification, CutoffSpecifications,
-    VAR_GENE_SYMBOL, VAR_GENE_IDS,
-    OBS_DOUBLET_SCORES, OBS_PREDICTED_DOUBLETS,
-    VAR_MITO
-)
+import os
 
 # %% ../nbs/02_utils.ipynb 5
-import os
-import copy
-
-from typing import TypeAlias, List, Sequence, Tuple
-
-import anndata as ad
-import numpy as np
-import pandas as pd
-import scanpy as sc
-import scrublet as scr
-import scipy
-import graphtools as gt
-import phate
-import magic
+from .types import AnnData, AnnDatas, ndarray
 
 # %% ../nbs/02_utils.ipynb 6
 def remove_non_numeric_from_str(s:str) -> str:
@@ -79,8 +53,7 @@ def time_to_num_from_idx_to_time(idx_to_time:dict) -> dict:
     return time_to_num
 
 def make_qc_fig_filename(
-    save_dir:str, 
-    study_name:str,
+    save_dir:str,  study_name:str,
     x:str, y:str, postfix:str=''
 ) -> str:     
     '''
@@ -96,8 +69,8 @@ def make_qc_fig_filename(
     )
 
 
-def arr_toarray(arr:np.array) -> np.array:
+def arr_toarray(arr:ndarray) -> ndarray:
     return arr.toarray() if hasattr(arr, 'toarray') else arr
 
-def adata_X_toarray(adata:AnnData) -> np.array:
+def adata_X_toarray(adata:AnnData) -> ndarray:
     return arr_toarray(adata.X)    

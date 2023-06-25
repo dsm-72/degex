@@ -12,6 +12,3 @@ collections.Iterable = collections.abc.Iterable
 collections.Mapping = collections.abc.Mapping
 collections.MutableSet = collections.abc.MutableSet
 collections.MutableMapping = collections.abc.MutableMapping
-
-# %% ../nbs/00_core.ipynb 4
-#| export

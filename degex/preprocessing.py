@@ -14,42 +14,26 @@ collections.MutableSet = collections.abc.MutableSet
 collections.MutableMapping = collections.abc.MutableMapping
 
 # %% ../nbs/05_preprocessing.ipynb 4
-from degex.types import (
-    AnnData, AnnDatas, Graph, SeriesLike,
-    VAR_HUMAN_TF, VAR_MOUSE_TF,
-    VAR_HUMAN_ENSEMBLE_ID, VAR_MOUSE_ENSEMBLE_ID,
-    LAYER_PRENORM, LAYER_DETECTED,
-    LAYER_SCALED_NORMALIZED, EMB_MAGIC,
-    EMB_PCA, EMB_PCA_HVG,
-    EMB_PHATE, EMB_PHATE_HVG,
-    CUTOFF_KIND, CUTOFF_SHORTHAND_TO_OBS_KEYS,
-    CutoffSpecification, CutoffSpecifications,
-    VAR_GENE_SYMBOL, VAR_GENE_IDS,
-    OBS_DOUBLET_SCORES, OBS_PREDICTED_DOUBLETS,
-    VAR_MITO
-)
+import os, copy, warnings
 
-# %% ../nbs/05_preprocessing.ipynb 5
-import os
-import copy
+import numpy as np, pandas as pd, scipy
+import phate, magic, graphtools as gt
+import scprep, anndata as ad, scanpy as sc, scrublet as scr
 
 from typing import TypeAlias, List, Sequence, Tuple
 
-import anndata as ad
-import numpy as np
-import pandas as pd
-import scanpy as sc
-import scrublet as scr
-import scipy
-import graphtools as gt
-import phate
-import magic
-import warnings
+# %% ../nbs/05_preprocessing.ipynb 5
+from degex.static import (
+    GENE_IDS, TOTAL_COUNTS, 
+    PCT_COUNTS_MITO, PCT_COUNTS_RIBO, DOUBLET_SCORES,
+)
+from degex.types import (
+    AnnData, Graph, CutoffSpec, CutoffSpecs, 
+)
 
-# %% ../nbs/05_preprocessing.ipynb 6
 from degex.adata import (
-    add_gene_ids_to_adata,
-    add_gene_symbols_to_adata,
+    set_gene_symbol_as_var_names,
+    set_var_names_as_gene_ids,
     score_doublets, apply_filter_by_cutoffs,
     remove_mitochondrial_genes,
     add_gene_detection_layer,
@@ -62,29 +46,28 @@ from degex.adata import (
     run_phate_on_hvg, run_phate_using_g, run_magic,
 )
 
-# %% ../nbs/05_preprocessing.ipynb 7
+# %% ../nbs/05_preprocessing.ipynb 6
 def prepare_h5ad_file(filename:str, plot:bool=False) -> AnnData:
     try:
         adata = sc.read_10x_h5(filename, gex_only = True)
     except ValueError:
         warnings.warn('Failed to use sc.read_10x_h5 to load file. Using read_h5ad as fallback. Is your data from 10x?')
         adata = sc.read_h5ad(filename)
-    adata = add_gene_symbols_to_adata(adata)
+    adata = set_gene_symbol_as_var_names(adata)
     try:
-        adata = add_gene_ids_to_adata(adata)
+        adata = set_var_names_as_gene_ids(adata)
     except KeyError:
-        warnings.warn(f'Failed to find a feature named {VAR_GENE_IDS} in adata.var. Not setting adata.var_names to `{VAR_GENE_IDS}`.')
+        warnings.warn(f'Failed to find a feature named {GENE_IDS} in adata.var. Not setting adata.names to `{GENE_IDS}`.')
     adata = score_doublets(adata, plot)
     return adata
 
-
 def filter_pipeline(
     adata:AnnData,
-    cutoff_specs:CutoffSpecifications = [
-        CutoffSpecification('total_counts', 500, 10000),
-        CutoffSpecification('pct_counts_mito', None, 15),
-        CutoffSpecification('pct_counts_ribo', None, 15),
-        CutoffSpecification('doublet_scores', None, 0.4),
+    cutoff_specs:CutoffSpecs = [
+        CutoffSpec(TOTAL_COUNTS,     500,  10000),
+        CutoffSpec(PCT_COUNTS_MITO, None, 15),
+        CutoffSpec(PCT_COUNTS_RIBO, None, 15),
+        CutoffSpec(DOUBLET_SCORES,  None, 0.4),
     ],
     min_cells:int=5,
     remove_mt_genes:bool=False,
