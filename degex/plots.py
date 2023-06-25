@@ -14,39 +14,22 @@ collections.MutableSet = collections.abc.MutableSet
 collections.MutableMapping = collections.abc.MutableMapping
 
 # %% ../nbs/04_plots.ipynb 4
-from degex.types import (
-    AnnData, AnnDatas, Graph, SeriesLike,
-    VAR_HUMAN_TF, VAR_MOUSE_TF,
-    VAR_HUMAN_ENSEMBLE_ID, VAR_MOUSE_ENSEMBLE_ID,
-    LAYER_PRENORM, LAYER_DETECTED,
-    LAYER_SCALED_NORMALIZED, EMB_MAGIC,
-    EMB_PCA, EMB_PCA_HVG,
-    EMB_PHATE, EMB_PHATE_HVG,
-    CUTOFF_KIND, CUTOFF_SHORTHAND_TO_OBS_KEYS,
-    CutoffSpecification, CutoffSpecifications,
-    VAR_GENE_SYMBOL, VAR_GENE_IDS,
-    OBS_DOUBLET_SCORES, OBS_PREDICTED_DOUBLETS,
-    VAR_MITO
-)
+import os, copy
 
-# %% ../nbs/04_plots.ipynb 5
-import os
-import copy
+import numpy as np, pandas as pd
+import scanpy as sc
 
 from typing import TypeAlias, List, Sequence, Tuple
 
-import anndata as ad
-import numpy as np
-import pandas as pd
-import scanpy as sc
-import scrublet as scr
-import scipy
-import graphtools as gt
-import phate
-import magic
+# %% ../nbs/04_plots.ipynb 5
+from degex.static import (
+    TOTAL_COUNTS, PCT_COUNTS_MITO, PCT_COUNTS_RIBO,
+)
+from .types import (AnnData, )
+from .utils import (make_qc_fig_filename)
 
 # %% ../nbs/04_plots.ipynb 6
-def plot_library_size(adata:AnnData, lower:float, upper:float):
+def plot_library_size(adata: AnnData, lower: float, upper: float):
     sc.plot.plot_library_size(
         adata.X, log=False, 
         title='Library Size', 
@@ -54,38 +37,35 @@ def plot_library_size(adata:AnnData, lower:float, upper:float):
     )
 
 # %% ../nbs/04_plots.ipynb 7
-from degex.utils import (
-    make_qc_fig_filename
-)
-
 def make_qc_figs(
-    adata:AnnData,
-    save_dir:str,
-    study_name:str,
+    adata: AnnData,
+    save_dir: str,
+    study_name: str,
 ) -> None:
     x = 'log10_total_counts'
     y = 'n_genes_by_counts'    
+    
     sc.pl.scatter(
-        adata, x=x, y=y, color="pct_counts_mito", 
+        adata, x=x, y=y, color=PCT_COUNTS_MITO, 
         save=make_qc_fig_filename(
             save_dir, study_name, x, y, 'mitopct'
         )        
     )
     sc.pl.scatter(
-        adata, x=x, y=y, color="pct_counts_ribo", 
+        adata, x=x, y=y, color=PCT_COUNTS_RIBO, 
         save=make_qc_fig_filename(
             save_dir, study_name, x, y, 'ribopcg'
         )
     )
-    x = 'total_counts'
+    x = TOTAL_COUNTS
     sc.pl.scatter(
-        adata, x=x, y=y, color="pct_counts_mito",
+        adata, x=x, y=y, color=PCT_COUNTS_MITO,
         save=make_qc_fig_filename(
             save_dir, study_name, x, y, 'mitopct'
         ) 
     )
     sc.pl.scatter(
-        adata, x=x, y=y, color="pct_counts_ribo", 
+        adata, x=x, y=y, color=PCT_COUNTS_RIBO, 
         save=make_qc_fig_filename(
             save_dir, study_name, x, y, 'ribopcg'
         )
@@ -98,7 +78,7 @@ def make_qc_figs(
         )
     )
 
-    x = 'pct_counts_mito'
+    x = PCT_COUNTS_MITO
     y = 'pct_counts_in_top_50_genes'
     sc.pl.scatter(
         adata, x=x, y=y, 
@@ -107,7 +87,7 @@ def make_qc_figs(
             save_dir, study_name, x, y, 'ngenes'
         )
     )
-    x = 'pct_counts_ribo'
+    x = PCT_COUNTS_RIBO
     sc.pl.scatter(
         adata, x=x, y=y,
         color="n_genes_by_counts", 
@@ -117,7 +97,7 @@ def make_qc_figs(
     )
     sc.pl.scatter(
         adata, x=x, y=y,        
-        color="pct_counts_mito", 
+        color=PCT_COUNTS_MITO, 
         save=make_qc_fig_filename(
             save_dir, study_name, x, y, 'ngenes'
         )
