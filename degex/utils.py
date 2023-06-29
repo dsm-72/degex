@@ -21,7 +21,7 @@ import os
 from .types import AnnData, AnnDatas, ndarray
 
 # %% ../nbs/02_utils.ipynb 6
-def remove_non_numeric_from_str(s:str) -> str:
+def remove_non_numeric_from_str(s: str) -> str:
     '''
     Removes non-numbers from string.
     Utility function used in `time_to_num_from_idx_to_time`.
@@ -29,7 +29,7 @@ def remove_non_numeric_from_str(s:str) -> str:
     s = ''.join(filter(str.isdigit, s))
     return s
 
-def time_to_num_from_idx_to_time(idx_to_time:dict) -> dict:
+def time_to_num_from_idx_to_time(idx_to_time: dict) -> dict:
     '''
     Examples:
         idx_to_time = {
@@ -53,8 +53,8 @@ def time_to_num_from_idx_to_time(idx_to_time:dict) -> dict:
     return time_to_num
 
 def make_qc_fig_filename(
-    save_dir:str,  study_name:str,
-    x:str, y:str, postfix:str=''
+    save_dir: str,  study_name: str,
+    x: str, y: str, postfix: str = ''
 ) -> str:     
     '''
     Utility function used in make_qc_figs to name files.

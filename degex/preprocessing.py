@@ -14,13 +14,9 @@ collections.MutableSet = collections.abc.MutableSet
 collections.MutableMapping = collections.abc.MutableMapping
 
 # %% ../nbs/05_preprocessing.ipynb 4
-import os, copy, warnings
-
-import numpy as np, pandas as pd, scipy
-import phate, magic, graphtools as gt
-import scprep, anndata as ad, scanpy as sc, scrublet as scr
-
-from typing import TypeAlias, List, Sequence, Tuple
+import copy, warnings
+from typing import Sequence, Tuple
+import scanpy as sc
 
 # %% ../nbs/05_preprocessing.ipynb 5
 from degex.static import (
@@ -47,7 +43,7 @@ from degex.adata import (
 )
 
 # %% ../nbs/05_preprocessing.ipynb 6
-def prepare_h5ad_file(filename:str, plot:bool=False) -> AnnData:
+def prepare_h5ad_file(filename: str, plot: bool = False) -> AnnData:
     try:
         adata = sc.read_10x_h5(filename, gex_only = True)
     except ValueError:
@@ -62,15 +58,15 @@ def prepare_h5ad_file(filename:str, plot:bool=False) -> AnnData:
     return adata
 
 def filter_pipeline(
-    adata:AnnData,
-    cutoff_specs:CutoffSpecs = [
+    adata: AnnData,
+    cutoff_specs: CutoffSpecs = [
         CutoffSpec(TOTAL_COUNTS,     500,  10000),
         CutoffSpec(PCT_COUNTS_MITO, None, 15),
         CutoffSpec(PCT_COUNTS_RIBO, None, 15),
         CutoffSpec(DOUBLET_SCORES,  None, 0.4),
     ],
-    min_cells:int=5,
-    remove_mt_genes:bool=False,
+    min_cells: int = 5,
+    remove_mt_genes: bool = False,
 ) -> AnnData:    
     adata = apply_filter_by_cutoffs(adata, cutoff_specs)
     sc.pp.filter_genes(adata, min_cells=min_cells)
@@ -80,8 +76,8 @@ def filter_pipeline(
 
 def normalization_pipeline(
     adata:AnnData,
-    s_genes:Sequence[str]=None,
-    g2m_genes:Sequence[str]=None
+    s_genes: Sequence[str] = None,
+    g2m_genes: Sequence[str] = None
 ) -> AnnData:
     adata = add_prenormalization_layer(adata)
     adata = add_gene_detection_layer(adata)
@@ -94,30 +90,30 @@ def normalization_pipeline(
     return adata
 
 def embedding_pipeline(
-    adata:AnnData,
+    adata: AnnData,
 
     # PCA on adata.X
-    pca_kwargs:dict=dict(n_components=100),
-    plot_scree:bool=False,
+    pca_kwargs: dict = dict(n_components=100),
+    plot_scree: bool = False,
     
     # PHATE on pca
-    phate_kwargs=dict(t=70),
-    g_kwargs=dict(knn=10),
+    phate_kwargs = dict(t=70),
+    g_kwargs = dict(knn=10),
     
-    do_hvg:bool=True,
+    do_hvg: bool = True,
 
     # How to calc hvg
-    hvg_kwargs:dict=dict(cutoff=None, percentile=90),
+    hvg_kwargs: dict = dict(cutoff=None, percentile=90),
 
     # PCA on hvg
-    hvg_pca_kwargs:dict=None,
+    hvg_pca_kwargs: dict=None,
     
     # PHATE on hvg
-    hvg_phate_kwargs:dict=None,
-    hvg_g_kwargs:dict=None,
+    hvg_phate_kwargs: dict = None,
+    hvg_g_kwargs: dict = None,
     
     # MAGIC on g_hvg
-    magic_knn_max:int=60
+    magic_knn_max: int = 60
 ) -> Tuple[AnnData, Graph, Graph]:
     g, g_hvg = None, None
 

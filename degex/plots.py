@@ -14,12 +14,8 @@ collections.MutableSet = collections.abc.MutableSet
 collections.MutableMapping = collections.abc.MutableMapping
 
 # %% ../nbs/04_plots.ipynb 4
-import os, copy
-
-import numpy as np, pandas as pd
+import os
 import scanpy as sc
-
-from typing import TypeAlias, List, Sequence, Tuple
 
 # %% ../nbs/04_plots.ipynb 5
 from degex.static import (

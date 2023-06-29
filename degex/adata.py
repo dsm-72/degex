@@ -21,7 +21,7 @@ collections.MutableSet = collections.abc.MutableSet
 collections.MutableMapping = collections.abc.MutableMapping
 
 # %% ../nbs/03_adata.ipynb 4
-import os, copy
+import copy
 
 import numpy as np, pandas as pd, scipy
 import phate, magic, graphtools as gt
