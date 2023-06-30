@@ -1,0 +1,93 @@
+[
+  {
+    "objectID": "adata.html",
+    "href": "adata.html",
+    "title": "adata",
+    "section": "",
+    "text": "source"
+  },
+  {
+    "objectID": "adata.html#quality-control",
+    "href": "adata.html#quality-control",
+    "title": "adata",
+    "section": "Quality Control",
+    "text": "Quality Control\n\nsource\n\ncalc_qc_stats\n\n calc_qc_stats (adata:anndata._core.anndata.AnnData,\n                qc_vars:Dict[str,tuple]={'mito': ('mt-',), 'ribo': ('rps',\n                'rpl')})\n\n\nsource\n\n\nmake_var_starts_with\n\n make_var_starts_with (var_starts_with:Optional[Dict[str,tuple]]={})\n\n\nsource\n\n\nvar_starts_with_pattern\n\n var_starts_with_pattern (name:str, patterns:Optional[Sequence[str]]=None)\n\n/opt/hostedtoolcache/Python/3.11.4/x64/lib/python3.11/site-packages/fastcore/docscrape.py:225: UserWarning: Unknown section See Also\n  else: warn(msg)\n\nsource\n\n\napply_filter_by_cutoffs\n\n apply_filter_by_cutoffs (adata:anndata._core.anndata.AnnData,\n                          cutoff_specs:List[degex.types.CutoffSpec],\n                          print_counts:bool=False)\n\nUses obs_key to filter adata between lower and upper if provided e.g.  lower &lt; adata.obs[obs_key] &lt; upper\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nadata\nAnnData\n\nAnnData to process.\n\n\ncutoff_specs\nList\n\nSpecifications in the form of (obs_key, lower, upper)to be used to filter_by_cutoffs.\n\n\nprint_counts\nbool\nFalse\nWhether or not to print counts.\n\n\nReturns\nAnnData\n\nfor function chaining\n\n\n\n\nsource\n\n\nfilter_by_cutoffs\n\n filter_by_cutoffs (adata:anndata._core.anndata.AnnData, lower:float=None,\n                    upper:float=None, obs_key:Union[ForwardRef('total_coun\n                    ts'),ForwardRef('pct_counts_mito'),ForwardRef('pct_cou\n                    nts_ribo'),ForwardRef('doublet_scores')]='total_counts\n                    ', print_counts:bool=False)\n\nUses obs_key to filter adata between lower and upper if provided e.g.  lower &lt; adata.obs[obs_key] &lt; upper\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nadata\nAnnData\n\nAnnData to process.\n\n\nlower\nfloat\nNone\nDefaults to None. The value which adata.obs[obs_key] should be greater than. If None, lower is not used.\n\n\nupper\nfloat\nNone\nDefaults to None. The value which adata.obs[obs_key] should be less than. If None, upper is not used.\n\n\nobs_key\nUnion\ntotal_counts\nWhich observation to test against.One of 'total_counts', 'pct_counts_mito', 'pct_counts_ribo', or 'doublet_score'. Defaultsto 'total_counts'.\n\n\nprint_counts\nbool\nFalse\nWhether or not to print counts.\n\n\nReturns\nAnnData\n\nfor function chaining"
+  },
+  {
+    "objectID": "adata.html#normalization",
+    "href": "adata.html#normalization",
+    "title": "adata",
+    "section": "Normalization",
+    "text": "Normalization\n\nsource\n\nsqrt_library_size_normalize\n\n sqrt_library_size_normalize (adata:anndata._core.anndata.AnnData)\n\n\nsource\n\n\nadd_gene_detection_layer\n\n add_gene_detection_layer (adata:anndata._core.anndata.AnnData)\n\n\nsource\n\n\nadd_prenormalization_layer\n\n add_prenormalization_layer (adata:anndata._core.anndata.AnnData)\n\n\nsource\n\n\nload_human_genes\n\n load_human_genes (adata:anndata._core.anndata.AnnData, filename:str)\n\n\nsource\n\n\nscore_genes_cell_cycle_with_batch_mean_center_data\n\n score_genes_cell_cycle_with_batch_mean_center_data\n                                                     (adata:anndata._core.\n                                                     anndata.AnnData, s_ge\n                                                     nes:Sequence[str], g2\n                                                     m_genes:Sequence[str]\n                                                     )\n\n\nsource\n\n\nadd_batch_mean_center_layer\n\n add_batch_mean_center_layer (adata:anndata._core.anndata.AnnData)"
+  },
+  {
+    "objectID": "adata.html#highly-variable-genes",
+    "href": "adata.html#highly-variable-genes",
+    "title": "adata",
+    "section": "Highly Variable Genes",
+    "text": "Highly Variable Genes\n\nsource\n\nselect_hvg_per_batch\n\n select_hvg_per_batch (adata:anndata._core.anndata.AnnData,\n                       hvg_kwargs:dict={'cutoff': None, 'percentile': 90})\n\nCalculates highly variable genes per batch in adata\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nadata\nAnnData\n\nAnnData to process.\n\n\nhvg_kwargs\ndict\n{‘cutoff’: None, ‘percentile’: 90}\nOptions to be passed to sc.select_highly_variable_genes.\n\n\nReturns\nAnnData\n\nfor function chaining"
+  },
+  {
+    "objectID": "adata.html#annotations-1",
+    "href": "adata.html#annotations-1",
+    "title": "adata",
+    "section": "Annotations",
+    "text": "Annotations\n\nsource\n\nadd_mouse_tfs_from_csv\n\n add_mouse_tfs_from_csv (adata:anndata._core.anndata.AnnData,\n                         filename:str, print_counts:bool=False)\n\n\nsource\n\n\nadd_human_tfs_from_csv\n\n add_human_tfs_from_csv (adata:anndata._core.anndata.AnnData,\n                         filename:str, print_counts:bool=False)\n\n\nsource\n\n\nadd_tf_annotations_from_csv\n\n add_tf_annotations_from_csv (adata:anndata._core.anndata.AnnData,\n                              filename:str, tf_key:str, ensemble_key:str,\n                              print_counts:bool=False)"
+  },
+  {
+    "objectID": "adata.html#normalization-1",
+    "href": "adata.html#normalization-1",
+    "title": "adata",
+    "section": "Normalization",
+    "text": "Normalization\n\nsource\n\nsubset_markers\n\n subset_markers (adata:anndata._core.anndata.AnnData,\n                 obs_key:str='Markers_cell',\n                 score_key:str='Markers_zscore', lower:float=2.2,\n                 upper:float=None, marker_name:str='marker',\n                 other_name:str='other')\n\n\nsource\n\n\nzscore_markers_in_layer\n\n zscore_markers_in_layer (adata:anndata._core.anndata.AnnData,\n                          markers:List[str], obs_key:str='Markers_zscore',\n                          layer_key:str='X_magic')"
+  },
+  {
+    "objectID": "adata.html#embeddings",
+    "href": "adata.html#embeddings",
+    "title": "adata",
+    "section": "Embeddings",
+    "text": "Embeddings\n\nPCA\n\nsource\n\n\nrun_pca_on_hvg\n\n run_pca_on_hvg (adata:anndata._core.anndata.AnnData,\n                 pca_kwargs:dict={'n_components': 100},\n                 plot_scree:bool=False)\n\n\nsource\n\n\nrun_pca\n\n run_pca (adata:anndata._core.anndata.AnnData,\n          pca_kwargs:dict={'n_components': 100}, plot_scree:bool=False,\n          emb_key:str='X_pca', col_subset:Union[list,pandas.core.series.Se\n          ries,numpy.ndarray,Iterable[numbers.Number],Any,List[int],List[U\n          nion[bool,numpy.bool_,Literal[0],Literal[1]]],pandas.core.indexe\n          s.base.Index]=None)\n\n\n\nPHATE\n\nsource\n\n\nrun_phate_on_hvg\n\n run_phate_on_hvg (adata:anndata._core.anndata.AnnData, g:&lt;function\n                   Graph&gt;=None, phate_kwargs:dict={'n_components': 3, 't':\n                   70}, g_kwargs:dict={'knn': 10},\n                   emb_key:str='X_phate_hvg')\n\n\nsource\n\n\nrun_phate_using_g\n\n run_phate_using_g (adata:anndata._core.anndata.AnnData, g:&lt;function\n                    Graph&gt;=None, phate_kwargs:dict={'n_components': 3,\n                    't': 70}, g_kwargs:dict={'knn': 10},\n                    emb_key:str='X_phate')\n\n\n\nMAGIC\n\nsource\n\n\nrun_magic\n\n run_magic (adata:anndata._core.anndata.AnnData, g:&lt;function Graph&gt;,\n            magic_kwargs:dict={'solver': 'approximate', 'n_jobs': -1,\n            'knn_max': 60})"
+  },
+  {
+    "objectID": "utils.html",
+    "href": "utils.html",
+    "title": "utils",
+    "section": "",
+    "text": "source\n\nadata_X_toarray\n\n adata_X_toarray (adata:anndata._core.anndata.AnnData)\n\n\nsource\n\n\narr_toarray\n\n arr_toarray (arr:numpy.ndarray)\n\n\nsource\n\n\nmake_qc_fig_filename\n\n make_qc_fig_filename (save_dir:str, study_name:str, x:str, y:str,\n                       postfix:str='')\n\nUtility function used in make_qc_figs to name files. Output files are in the form of: {save_dir}/.QC_{study_name}_{x}_{y}_{postfix}.png\n\nsource\n\n\ntime_to_num_from_idx_to_time\n\n time_to_num_from_idx_to_time (idx_to_time:dict)\n\nExamples: idx_to_time = { ‘0’: ‘12hr’, ‘1’: ‘18hr’, ‘2’: ‘24hr’ }\ngets converted into\ntime_to_num = { ‘12hr’: ‘12’, ‘18hr’: ‘18’, ‘24hr’: ‘24’ }\n\nsource\n\n\nremove_non_numeric_from_str\n\n remove_non_numeric_from_str (s:str)\n\nRemoves non-numbers from string. Utility function used in time_to_num_from_idx_to_time."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "DEtect Gene EXpression (degex)",
+    "section": "",
+    "text": "# create conda environment\n$ conda env create -f env.yml\n\n# update conda environment\n$ conda env update -n degex --file env.yml\npip install degex"
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "DEtect Gene EXpression (degex)",
+    "section": "",
+    "text": "# create conda environment\n$ conda env create -f env.yml\n\n# update conda environment\n$ conda env update -n degex --file env.yml\npip install degex"
+  },
+  {
+    "objectID": "plots.html",
+    "href": "plots.html",
+    "title": "Plots",
+    "section": "",
+    "text": "source\n\nplot_library_size\n\n plot_library_size (adata:anndata._core.anndata.AnnData, lower:float,\n                    upper:float)\n\n\nsource\n\n\nmake_qc_figs\n\n make_qc_figs (adata:anndata._core.anndata.AnnData, save_dir:str,\n               study_name:str)"
+  },
+  {
+    "objectID": "types.html",
+    "href": "types.html",
+    "title": "types",
+    "section": "",
+    "text": "source\n\nCutoffSpec\n\n CutoffSpec (obs_key:Union[ForwardRef('total_counts'),ForwardRef('pct_coun\n             ts_mito'),ForwardRef('pct_counts_ribo'),ForwardRef('doublet_s\n             cores'),str]='total_counts', lower:Optional[float]=None,\n             upper:Optional[float]=None)\n\n\nsource\n\n\nstr_to_cutoff\n\n str_to_cutoff (s:str)"
+  },
+  {
+    "objectID": "preprocessing.html",
+    "href": "preprocessing.html",
+    "title": "preprocessing",
+    "section": "",
+    "text": "source\n\nembedding_pipeline\n\n embedding_pipeline (adata:anndata._core.anndata.AnnData,\n                     pca_kwargs:dict={'n_components': 100},\n                     plot_scree:bool=False, phate_kwargs={'n_components':\n                     3, 't': 70}, g_kwargs={'knn': 10}, do_hvg:bool=True,\n                     hvg_kwargs:dict={'cutoff': None, 'percentile': 90},\n                     hvg_pca_kwargs:dict=None, hvg_phate_kwargs:dict=None,\n                     hvg_g_kwargs:dict=None, do_magic:bool=True,\n                     magic_kwargs:dict={'solver': 'approximate', 'n_jobs':\n                     -1, 'knn_max': 60})\n\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nadata\nAnnData\n\n\n\n\npca_kwargs\ndict\n{‘n_components’: 100}\nPCA on adata.X\n\n\nplot_scree\nbool\nFalse\n\n\n\nphate_kwargs\ndict\n{‘n_components’: 3, ‘t’: 70}\nPHATE on pca\n\n\ng_kwargs\ndict\n{‘knn’: 10}\n\n\n\ndo_hvg\nbool\nTrue\n\n\n\nhvg_kwargs\ndict\n{‘cutoff’: None, ‘percentile’: 90}\nHow to calc hvg\n\n\nhvg_pca_kwargs\ndict\nNone\nPCA on hvg\n\n\nhvg_phate_kwargs\ndict\nNone\nPHATE on hvg\n\n\nhvg_g_kwargs\ndict\nNone\n\n\n\ndo_magic\nbool\nTrue\nMAGIC on g_hvg\n\n\nmagic_kwargs\ndict\n{‘solver’: ‘approximate’, ‘n_jobs’: -1, ‘knn_max’: 60}\n\n\n\nReturns\nTuple\n\n\n\n\n\n\nsource\n\n\nnormalization_pipeline\n\n normalization_pipeline (adata:anndata._core.anndata.AnnData,\n                         s_genes:Sequence[str]=None,\n                         g2m_genes:Sequence[str]=None)\n\n\nsource\n\n\nfilter_pipeline\n\n filter_pipeline (adata:anndata._core.anndata.AnnData, cutoff_specs:List[d\n                  egex.types.CutoffSpec]=[CutoffSpec(obs_key='total_counts\n                  ', lower=500, upper=10000),\n                  CutoffSpec(obs_key='pct_counts_mito', lower=None,\n                  upper=15), CutoffSpec(obs_key='pct_counts_ribo',\n                  lower=None, upper=15),\n                  CutoffSpec(obs_key='doublet_scores', lower=None,\n                  upper=0.4)], min_cells:int=5, min_genes:int=200,\n                  remove_mt_genes:bool=False)\n\n\nsource\n\n\nprepare_h5ad_file\n\n prepare_h5ad_file (filename:str, plot:bool=False)"
+  }
+]
