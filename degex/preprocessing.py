@@ -42,6 +42,10 @@ from degex.adata import (
     run_phate_on_hvg, run_phate_using_g, run_magic,
 )
 
+from degex.adata import (
+    PCA_KWARGS, PHATE_KWARGS, G_KWARGS, MAGIC_KWARGS
+)
+
 # %% ../nbs/05_preprocessing.ipynb 6
 def prepare_h5ad_file(filename: str, plot: bool = False) -> AnnData:
     try:
@@ -66,10 +70,18 @@ def filter_pipeline(
         CutoffSpec(DOUBLET_SCORES,  None, 0.4),
     ],
     min_cells: int = 5,
+    min_genes: int = 200,
     remove_mt_genes: bool = False,
 ) -> AnnData:    
-    adata = apply_filter_by_cutoffs(adata, cutoff_specs)
-    sc.pp.filter_genes(adata, min_cells=min_cells)
+    if cutoff_specs is not None:
+        adata = apply_filter_by_cutoffs(adata, cutoff_specs)
+    
+    if min_genes:
+        sc.pp.filter_cells(adata, min_genes=min_genes)
+    
+    if min_cells:
+        sc.pp.filter_genes(adata, min_cells=min_cells)
+    
     if remove_mt_genes:
         adata = remove_mitochondrial_genes(adata)    
     return adata
@@ -93,12 +105,12 @@ def embedding_pipeline(
     adata: AnnData,
 
     # PCA on adata.X
-    pca_kwargs: dict = dict(n_components=100),
+    pca_kwargs: dict = PCA_KWARGS,
     plot_scree: bool = False,
     
     # PHATE on pca
-    phate_kwargs = dict(t=70),
-    g_kwargs = dict(knn=10),
+    phate_kwargs = PHATE_KWARGS,
+    g_kwargs = G_KWARGS,
     
     do_hvg: bool = True,
 
@@ -113,7 +125,8 @@ def embedding_pipeline(
     hvg_g_kwargs: dict = None,
     
     # MAGIC on g_hvg
-    magic_knn_max: int = 60
+    do_magic: bool = True,
+    magic_kwargs: dict = MAGIC_KWARGS
 ) -> Tuple[AnnData, Graph, Graph]:
     g, g_hvg = None, None
 
@@ -144,6 +157,7 @@ def embedding_pipeline(
         adata, g_hvg = run_phate_on_hvg(adata, g_hvg, hvg_phate_kwargs, hvg_g_kwargs)
 
         # STEP 7: MAGIC on g_hvg --> X_magic
-        adata = run_magic(adata, g_hvg, magic_knn_max)
+        if do_magic:
+            adata = run_magic(adata, g_hvg, magic_kwargs)
 
     return adata, g, g_hvg
